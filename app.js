@@ -1449,3 +1449,64 @@ function init() {
 }
 
 init();
+/* ═══════════════════════════════
+   JSONBIN SYNC — KAVAJU ERP
+═══════════════════════════════ */
+
+function getERPData(){
+  return {
+    presus,
+    pedidos,
+    facturas,
+    clientes,
+    productos,
+    proveedores,
+    gastos,
+    counters
+  };
+}
+
+function setERPData(data){
+  if(!data) return;
+
+  presus      = data.presus      || [];
+  pedidos     = data.pedidos     || [];
+  facturas    = data.facturas    || [];
+  clientes    = data.clientes    || [];
+  productos   = data.productos   || [];
+  proveedores = data.proveedores || [];
+  gastos      = data.gastos      || [];
+  counters    = data.counters    || counters;
+
+  saveAll();
+
+  renderPanel(activePanel);
+  updateSidebar();
+
+  toast("Datos cargados desde JSONBin ✓");
+}
+
+async function cargarDesdeNube(){
+  const data = await loadCloud();
+
+  if(data && Object.keys(data).length){
+    setERPData(data);
+  }else{
+    await saveCloud(getERPData());
+    toast("Base inicial subida a JSONBin ✓");
+  }
+}
+
+const saveAllLocal = saveAll;
+
+saveAll = function(){
+  saveAllLocal();
+
+  if(typeof saveCloud === "function"){
+    saveCloud(getERPData());
+  }
+};
+
+setTimeout(()=>{
+  cargarDesdeNube();
+},800);
