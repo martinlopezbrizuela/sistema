@@ -1,18 +1,36 @@
 console.log("KAVAJU ERP iniciado");
 
-/* DEMO SIMPLE */
+/* TEST JSONBIN */
+
+async function iniciarSistema(){
+
+  console.log("Conectando nube...");
+
+  const datos = await loadCloud();
+
+  console.log("Datos nube:", datos);
+
+}
+
+iniciarSistema();
+
+/* EFECTOS UI */
 
 const cards = document.querySelectorAll(".card");
 
 cards.forEach(card => {
 
   card.addEventListener("mouseenter", () => {
+
     card.style.transform = "translateY(-4px)";
     card.style.transition = ".2s";
+
   });
 
   card.addEventListener("mouseleave", () => {
+
     card.style.transform = "translateY(0px)";
+
   });
 
 });
@@ -32,5 +50,3 @@ menuItems.forEach(btn => {
   });
 
 });
-
-console.log("UI cargada correctamente");
