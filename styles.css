@@ -624,3 +624,130 @@ textarea:focus{
   }
 
 }
+Sí, se ve feo porque el CSS que te pasé dejó mal los gráficos y las tarjetas. Pegá este parche al final de styles.css:
+
+/* FIX VISUAL DASHBOARD KAVAJU */
+.kpi-grid{
+  grid-template-columns:repeat(3,1fr);
+  gap:16px;
+}
+.kpi-card{
+  min-height:145px;
+  border-radius:18px;
+  padding:22px;
+}
+.kpi-val{
+  font-family:var(--fb);
+  font-size:34px;
+  font-weight:800;
+  letter-spacing:-1px;
+  line-height:1.1;
+}
+.kpi-label{
+  font-family:var(--fb);
+  font-size:13px;
+  color:#9a9187;
+  letter-spacing:1.4px;
+}
+.kpi-sub{
+  font-size:14px;
+  color:#9a9187;
+}
+.kpi-ico{
+  font-size:22px;
+  opacity:.8;
+  margin-top:10px;
+}
+.dash-grid{
+  display:grid;
+  grid-template-columns:2fr 1fr;
+  gap:18px;
+}
+.dash-grid .span2{
+  grid-column:auto;
+}
+.card{
+  border-radius:18px;
+  padding:22px;
+  box-shadow:0 6px 18px rgba(75,55,35,.06);
+}
+.bar-chart{
+  height:190px;
+  display:flex;
+  align-items:flex-end;
+  gap:14px;
+  padding:20px 10px 5px;
+}
+.bar-col{
+  flex:1;
+  height:100%;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+  position:relative;
+}
+.bar-col .bar{
+  width:36px;
+  min-height:8px;
+  background:#8b5e34;
+  border-radius:8px 8px 0 0;
+}
+.bar-col .bar.active-bar{
+  background:#234b34;
+}
+.bar-col .bval{
+  position:absolute;
+  top:-24px;
+  font-size:11px;
+  color:#6f5a45;
+  white-space:nowrap;
+  display:none;
+}
+.bar-col:hover .bval{
+  display:block;
+}
+#dash-chart-labels div{
+  font-size:12px!important;
+  color:#9a9187!important;
+}
+.sec-title{
+  font-family:var(--fb);
+  font-size:18px;
+  font-weight:700;
+}
+.sec-title .dot{
+  background:#8b5e34;
+  box-shadow:none;
+}
+.alert-box{
+  background:transparent!important;
+  border:none!important;
+  padding:4px 0;
+  font-size:18px;
+}
+.btn-t{
+  border-radius:999px;
+  padding:6px 12px;
+}
+.btn-t.b,
+.btn-t.g,
+.btn-t.br{
+  background:#e9f3ec;
+  color:#234b34;
+}
+.tbl-wrap table th{
+  background:#f3eee6;
+}
+.pie-wrap svg{
+  width:130px;
+  height:130px;
+}
+@media(max-width:900px){
+  .kpi-grid{
+    grid-template-columns:1fr;
+  }
+  .dash-grid{
+    grid-template-columns:1fr;
+  }
+}
+
