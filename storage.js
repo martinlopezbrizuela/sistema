@@ -1,7 +1,7 @@
 const BIN_ID = "6a090b2fadc21f119aaf5293";
 
 /* PEGAR TU API KEY ACA */
-const API_KEY = "TU_API_KEY";
+const API_KEY = "$2a$10$7rFsw/Rs1i.Z39Kt2LYdVuNmfJc0OR5xy706GRKw28q1wUi3tVChK";
 
 const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
