@@ -1,16 +1,13 @@
 const BIN_ID = "6a090b2fadc21f119aaf5293";
 
-/* PEGAR TU API KEY ACA */
 const API_KEY = "$2a$10$7rFsw/Rs1i.Z39Kt2LYdVuNmfJc0OR5xy706GRKw28q1wUi3tVChK";
-
-const BASE_URL = `https://api.jsonbin.io/v3/b/${BIN_ID}`;
 
 async function loadCloud(){
 
   try{
 
     const response = await fetch(
-      `${BASE_URL}/latest`,
+      `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,
       {
         headers:{
           "X-Master-Key": API_KEY
@@ -20,45 +17,13 @@ async function loadCloud(){
 
     const data = await response.json();
 
-    console.log("Datos cargados:", data);
-
     return data.record;
 
   }catch(error){
 
-    console.error("Error cargando nube:", error);
+    console.error(error);
 
     return null;
-  }
-
-}
-
-async function saveCloud(data){
-
-  try{
-
-    const response = await fetch(
-      BASE_URL,
-      {
-        method:"PUT",
-
-        headers:{
-          "Content-Type":"application/json",
-          "X-Master-Key": API_KEY
-        },
-
-        body: JSON.stringify(data)
-      }
-    );
-
-    const result = await response.json();
-
-    console.log("Datos guardados:", result);
-
-  }catch(error){
-
-    console.error("Error guardando nube:", error);
-
   }
 
 }
