@@ -1,28 +1,24 @@
-console.log("KAVAJU ERP funcionando");
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("KAVAJU ERP funcionando");
 
-document.querySelectorAll(".menu-item").forEach(btn => {
+  const menuItems = document.querySelectorAll(".menu-item");
+  const titulo = document.querySelector(".topbar h1");
+  const subtitulo = document.querySelector(".topbar p");
+  const nuevoBtn = document.querySelector(".new-btn");
 
-  btn.addEventListener("click", () => {
+  menuItems.forEach(btn => {
+    btn.addEventListener("click", () => {
+      menuItems.forEach(b => b.classList.remove("active"));
+      btn.classList.add("active");
 
-    document.querySelectorAll(".menu-item").forEach(b => {
-      b.classList.remove("active");
+      const texto = btn.textContent.trim();
+
+      titulo.textContent = texto;
+      subtitulo.textContent = "Módulo " + texto + " cargado correctamente";
     });
-
-    btn.classList.add("active");
-
-    const titulo = btn.textContent.trim();
-
-    document.querySelector(".topbar h1").textContent = titulo;
-
-    document.querySelector(".topbar p").textContent =
-      "Módulo " + titulo + " cargado correctamente";
-
   });
 
-});
-
-document.querySelector(".new-btn").addEventListener("click", () => {
-
-  alert("Nuevo pedido próximamente.");
-
+  nuevoBtn.addEventListener("click", () => {
+    alert("Formulario de nuevo pedido próximamente.");
+  });
 });
