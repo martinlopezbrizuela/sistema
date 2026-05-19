@@ -1,3 +1,10 @@
+Acá está el CSS completo para copiar y pegar:
+
+/* ═══════════════════════════════════════════════════════════
+   KAVAJU ERP — CSS v5.0 FINAL
+   Paleta: Marrón #7B4A2D | Fondo blanco limpio
+   Fuentes: DM Sans + DM Mono
+   ═══════════════════════════════════════════════════════════ */
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&family=DM+Mono:wght@400;500&display=swap');
 
@@ -222,10 +229,10 @@ tbody tr:hover td { background:rgba(123,74,45,.025); }
 .btn-add-item { padding:6px 14px; background:var(--brown); color:#fff; border:none; border-radius:7px; font-size:12px; font-weight:600; font-family:var(--ff); cursor:pointer; transition:background .15s; }
 .btn-add-item:hover { background:var(--brown-dk); }
 .items-wrap { background:var(--bg); border:1px solid var(--border); border-radius:var(--r2); overflow:hidden; margin-bottom:4px; }
-.items-head { display:grid; grid-template-columns:2.5fr .6fr 1fr 1fr 1fr 1fr 28px; gap:6px; padding:8px 12px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.5px; font-family:var(--fm); }
+.items-head { display:grid; grid-template-columns:2.5fr .6fr 1fr 1fr 1fr 28px; gap:6px; padding:8px 12px; background:var(--bg2); border-bottom:1px solid var(--border); font-size:10px; font-weight:700; color:var(--text3); text-transform:uppercase; letter-spacing:.5px; font-family:var(--fm); }
 .items-head .tc { text-align:center; }
 .items-head .tr { text-align:right; }
-.item-row { display:grid; grid-template-columns:2.5fr .6fr 1fr 1fr 1fr 1fr 28px; gap:6px; padding:8px 12px; border-bottom:1px solid var(--border); align-items:center; }
+.item-row { display:grid; grid-template-columns:2.5fr .6fr 1fr 1fr 1fr 28px; gap:6px; padding:8px 12px; border-bottom:1px solid var(--border); align-items:center; }
 .item-row:last-child { border-bottom:none; }
 .item-cell input, .item-cell select { width:100%; padding:6px 8px; background:var(--card); border:1px solid var(--border); border-radius:6px; font-size:12px; font-family:var(--ff); color:var(--text); outline:none; }
 .item-cell input:focus, .item-cell select:focus { border-color:var(--brown); box-shadow:0 0 0 2px rgba(123,74,45,.1); }
@@ -251,6 +258,14 @@ tbody tr:hover td { background:rgba(123,74,45,.025); }
 .tbtn-close { background:rgba(255,255,255,.12); color:#fff; }
 #print-body { padding:20px; }
 
+/* ── BUSCADOR AUTOCOMPLETE PRODUCTOS ── */
+.prod-dropdown { position:absolute; top:100%; left:0; right:0; background:var(--card); border:1px solid var(--border-str); border-radius:0 0 var(--r1) var(--r1); box-shadow:0 8px 24px rgba(0,0,0,.12); z-index:500; max-height:220px; overflow-y:auto; }
+.prod-drop-item { display:flex; justify-content:space-between; align-items:center; padding:8px 12px; cursor:pointer; font-size:12px; border-bottom:1px solid var(--border); transition:background .1s; }
+.prod-drop-item:last-child { border-bottom:none; }
+.prod-drop-item:hover { background:rgba(123,74,45,.06); }
+.pdi-name { color:var(--text2); font-weight:500; }
+.pdi-price { color:var(--brown); font-family:var(--fm); font-size:11px; flex-shrink:0; }
+
 @media print {
   #sidebar, #topbar, .print-toolbar { display:none !important; }
   #print-overlay { position:static; background:#fff; }
@@ -271,3 +286,6 @@ tbody tr:hover td { background:rgba(123,74,45,.025); }
   .form-grid { grid-template-columns:1fr; }
   .fld.wide { grid-column:span 1; }
 }
+
+
+Eso es todo el CSS. Copialo completo y reemplazá styles.css en GitHub. El app.js ya lo tenés en el archivo descargable de antes. 🐴​​​​​​​​​​​​​​​​
