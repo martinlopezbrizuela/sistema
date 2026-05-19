@@ -1477,4 +1477,5 @@ saveAll = function(){
   saveAllLocal();
   if(typeof saveCloud === "function"){ saveCloud(getERPData()); }
 };
+;
 setTimeout(()=>{ cargarDesdeNube(); }, 800);
