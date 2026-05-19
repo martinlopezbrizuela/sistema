@@ -1219,7 +1219,7 @@ function buildPresupuestoHTML(p) {
         <img class="logo" src="${LOGO}" alt="Kavaju"/>
         <div class="emp">
           <h1>AGROPECUARIA KAVAJU E.A.S.</h1>
-          <p>Tte. Pino González 3335, Asunción - Paraguay<br/>Tel.: 0981 409 495 / 0982 162 823<br/>ventaskavaju@gmail.com | RUC: 80148174-0</p>
+          <p>Tte. Pino González 3335, Asunción - Paraguay<br/>Tel.: 0981 409 495 / 0985 110 074<br/>ventaskavaju@gmail.com | RUC: 80148174-0</p>
         </div>
       </div>
       <div class="hr2">
@@ -1299,7 +1299,7 @@ function buildFacturaHTML(f) {
         <img class="logo" src="${LOGO}" alt="Kavaju"/>
         <div class="emp">
           <h1>AGROPECUARIA KAVAJU E.A.S.</h1>
-          <p>Tte. Pino González 3335, Asunción - Paraguay<br/>Tel.: 0981 409 495 / 0982 162 823<br/>ventaskavaju@gmail.com | RUC: 80148174-0</p>
+          <p>Tte. Pino González 3335, Asunción - Paraguay<br/>Tel.: 0981 409 495 / 0985 110 074<br/>ventaskavaju@gmail.com | RUC: 80148174-0</p>
           ${f.timbrado?`<div class="timb">Timbrado N°: ${he(f.timbrado)}</div>`:''}
         </div>
       </div>
