@@ -1,0 +1,19 @@
+{
+  "name": "sistema-kavaju",
+  "version": "1.0.0",
+  "description": "Sistema de gestión ERP para Agropecuaria Kavaju",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["erp", "inventory", "invoicing"],
+  "author": "Kavaju",
+  "license": "MIT",
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}
