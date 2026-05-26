@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAVAJU28 Login</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;background:#e7e4dc;font-family:"Courier New",monospace}
+.monitor{width:850px;max-width:95%;padding:24px;background:#b9b6ae;border-radius:28px;border:4px solid #7d7a74;box-shadow:inset 0 0 15px rgba(255,255,255,.7),0 20px 50px rgba(0,0,0,.35)}
+.frame{background:#111;padding:28px;border-radius:26px}
+.screen{position:relative;min-height:650px;padding:40px;border-radius:24px;background:#f7f7f2;border:4px solid #111;color:#111;overflow:hidden;box-shadow:inset 0 0 45px rgba(0,0,0,.18)}
+.screen::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.035),rgba(0,0,0,.035) 1px,transparent 1px,transparent 4px);pointer-events:none}
+.content{position:relative;z-index:2}
+.topbar{display:flex;justify-content:space-between;font-size:17px;font-weight:bold}
+.separator{margin:18px 0 40px;border-top:3px dashed #111}
+.title{text-align:center;font-size:90px;font-weight:900;letter-spacing:5px;margin-bottom:18px}
+.subtitle{text-align:center;font-size:24px;font-weight:bold;margin-bottom:40px}
+.box{width:80%;margin:auto;padding:35px;border:4px solid #111;text-align:center}
+.box p{font-size:24px;margin-bottom:8px;font-weight:bold}
+.small-separator{border-top:3px dashed #111;margin:30px 0}
+label{display:block;font-size:22px;font-weight:bold;margin-bottom:20px}
+input{width:320px;max-width:100%;padding:18px;border:4px solid #111;background:#f7f7f2;color:#111;text-align:center;font-size:34px;letter-spacing:18px;font-family:"Courier New",monospace;outline:none}
+button{display:block;margin:30px auto 0;padding:15px 50px;border:4px solid #111;background:#f7f7f2;color:#111;font-size:22px;font-weight:bold;font-family:"Courier New",monospace;cursor:pointer}
+button:hover{background:#111;color:#f7f7f2}
+#msg{margin-top:25px;font-size:22px;font-weight:bold}
+.footer{margin-top:40px;display:flex;justify-content:space-between;font-size:17px;font-weight:bold}
+</style>
+</head>
+<body>
+<div class="monitor">
+  <div class="frame">
+    <div class="screen">
+      <div class="content">
+        <div class="topbar">
+          <span>KAVAJU28 SYSTEMS v1.0</span>
+          <span>© 2026 KAVAJU INDUSTRIES</span>
+        </div>
+        <div class="separator"></div>
+        <div class="title">KAVAJU28</div>
+        <div class="subtitle">— USUARIO > DRACULA —</div>
+        <div class="box">
+          <p>ACCESO RESTRINGIDO</p>
+          <p>SOLO PERSONAL AUTORIZADO</p>
+          <div class="small-separator"></div>
+          <label>INGRESE SU PIN</label>
+          <input type="password" id="pin" maxlength="4" autofocus>
+          <button onclick="login()">[ ENTRAR ]</button>
+          <div id="msg"></div>
+        </div>
+        <div class="footer">
+          <span>F1: AYUDA</span>
+          <span>F2: RECUPERAR</span>
+          <span>F10: SALIR</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+function login(){
+  const pin = document.getElementById("pin").value;
+  const msg = document.getElementById("msg");
+  if(pin === "3335"){
+    msg.innerHTML = "ABRAZO FRANJEADO";
+    setTimeout(function(){ window.location.href = "/sistema.html"; }, 1000);
+  } else {
+    msg.innerHTML = "PIN INCORRECTO";
+  }
+}
+document.getElementById("pin").addEventListener("keydown", function(e){
+  if(e.key === "Enter") login();
+});
+</script>
+</body>
+</html>
