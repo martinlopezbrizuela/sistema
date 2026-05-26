@@ -1,453 +1,76 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>KAVAJU ERP V4 — Agropecuaria KAVAJU E.A.S.</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet"/>
-<link rel="stylesheet" href="styles.css"/>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KAVAJU28 Login</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{min-height:100vh;display:flex;justify-content:center;align-items:center;background:#e7e4dc;font-family:"Courier New",monospace}
+.monitor{width:850px;max-width:95%;padding:24px;background:#b9b6ae;border-radius:28px;border:4px solid #7d7a74;box-shadow:inset 0 0 15px rgba(255,255,255,.7),0 20px 50px rgba(0,0,0,.35)}
+.frame{background:#111;padding:28px;border-radius:26px}
+.screen{position:relative;min-height:650px;padding:40px;border-radius:24px;background:#f7f7f2;border:4px solid #111;color:#111;overflow:hidden;box-shadow:inset 0 0 45px rgba(0,0,0,.18)}
+.screen::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.035),rgba(0,0,0,.035) 1px,transparent 1px,transparent 4px);pointer-events:none}
+.content{position:relative;z-index:2}
+.topbar{display:flex;justify-content:space-between;font-size:17px;font-weight:bold}
+.separator{margin:18px 0 40px;border-top:3px dashed #111}
+.title{text-align:center;font-size:90px;font-weight:900;letter-spacing:5px;margin-bottom:18px}
+.subtitle{text-align:center;font-size:24px;font-weight:bold;margin-bottom:40px}
+.box{width:80%;margin:auto;padding:35px;border:4px solid #111;text-align:center}
+.box p{font-size:24px;margin-bottom:8px;font-weight:bold}
+.small-separator{border-top:3px dashed #111;margin:30px 0}
+label{display:block;font-size:22px;font-weight:bold;margin-bottom:20px}
+input{width:320px;max-width:100%;padding:18px;border:4px solid #111;background:#f7f7f2;color:#111;text-align:center;font-size:34px;letter-spacing:18px;font-family:"Courier New",monospace;outline:none}
+button{display:block;margin:30px auto 0;padding:15px 50px;border:4px solid #111;background:#f7f7f2;color:#111;font-size:22px;font-weight:bold;font-family:"Courier New",monospace;cursor:pointer}
+button:hover{background:#111;color:#f7f7f2}
+#msg{margin-top:25px;font-size:22px;font-weight:bold}
+.footer{margin-top:40px;display:flex;justify-content:space-between;font-size:17px;font-weight:bold}
+</style>
 </head>
 <body>
-<div id="lbar"></div>
-<div id="toast-wrap"></div>
-<div id="app">
-  <!-- SIDEBAR -->
-  <div id="sidebar">
- <div class="sb-logo">
-  <div class="sb-logo-icon">
-    <strong>K</strong>
-  </div>
-
-  <div class="sb-logo-text">
-    <div class="name">KAVAJU</div>
-    <div class="sub">ERP V4 · Agropecuaria</div>
-  </div>
-</div> 
-    <nav class="sb-nav">
-      <div class="sb-group">Principal</div>
-      <div class="sb-item active" onclick="goPanel('dashboard')"><span class="ico">⬡</span><span>Dashboard</span></div>
-      <div class="sb-group">Ventas</div>
-      <div class="sb-item" id="sb-presupuestos" onclick="goPanel('presupuestos')"><span class="ico">📋</span><span>Presupuestos</span><span class="sbadge amber" id="sbb-presu" style="display:none">0</span></div>
-      <div class="sb-item" id="sb-pedidos" onclick="goPanel('pedidos')"><span class="ico">📦</span><span>Pedidos</span><span class="sbadge amber" id="sbb-ped" style="display:none">0</span></div>
-      <div class="sb-item" id="sb-facturas" onclick="goPanel('facturas')"><span class="ico">🧾</span><span>Facturación</span></div>
-      <div class="sb-group">Finanzas</div>
-      <div class="sb-item" id="sb-cobrar" onclick="goPanel('cobrar')"><span class="ico">💰</span><span>Cuentas a Cobrar</span><span class="sbadge red" id="sbb-cobrar" style="display:none">0</span></div>
-      <div class="sb-item" id="sb-gastos" onclick="goPanel('gastos')"><span class="ico">💸</span><span>Gastos</span></div>
-      <div class="sb-group">Inventario</div>
-      <div class="sb-item" id="sb-stock" onclick="goPanel('stock')"><span class="ico">🏭</span><span>Stock</span><span class="sbadge" id="sbb-stock" style="display:none">0</span></div>
-      <div class="sb-group">Maestros</div>
-      <div class="sb-item" id="sb-clientes" onclick="goPanel('clientes')"><span class="ico">👥</span><span>Clientes</span></div>
-      <div class="sb-item" id="sb-productos" onclick="goPanel('productos')"><span class="ico">🗂</span><span>Productos</span></div>
-      <div class="sb-item" id="sb-proveedores" onclick="goPanel('proveedores')"><span class="ico">🚚</span><span>Proveedores</span></div>
-    </nav>
-    <div class="sb-footer">v4.0 · Kavaju ERP · 2025</div>
-  </div>
-  <!-- MAIN -->
-  <div id="main">
-    <div id="topbar">
-      <div class="tb-title" id="topbar-title">Dashboard <span>/ Inicio</span></div>
-      <div class="tb-search"><span style="color:var(--muted2)">🔍</span><input type="text" id="global-search" placeholder="Buscar..."/></div>
-      <button class="tb-btn primary" id="topbar-new-btn" onclick="topbarNew()" style="display:none">＋ Nuevo</button>
-      <div class="tb-user"><div class="av">MV</div><span class="uname">Martín</span></div>
-    </div>
-    <div id="content">
-      <!-- DASHBOARD -->
-      <div class="panel active" id="panel-dashboard">
-        <div id="dash-alerts"></div>
-        <div class="kpi-grid" id="dash-kpis"></div>
-        <div class="dash-grid">
-          <div class="card span2">
-            <div class="sec-hdr"><div class="sec-title"><span class="dot"></span>Ventas Últimos 6 Meses</div></div>
-            <div class="bar-chart" id="dash-chart"></div>
-            <div style="display:flex;justify-content:space-around;margin-top:6px" id="dash-chart-labels"></div>
-          </div>
-          <div class="card">
-            <div class="sec-title" style="margin-bottom:14px"><span class="dot"></span>Estado de Cuentas</div>
-            <div class="pie-wrap" id="dash-pie"></div>
-          </div>
+<div class="monitor">
+  <div class="frame">
+    <div class="screen">
+      <div class="content">
+        <div class="topbar">
+          <span>KAVAJU28 SYSTEMS v1.0</span>
+          <span>© 2026 KAVAJU INDUSTRIES</span>
         </div>
-        <div class="dash-grid">
-          <div class="card">
-            <div class="sec-hdr">
-              <div class="sec-title"><span class="dot"></span>Stock Bajo / Sin Stock</div>
-              <button class="btn-t br" onclick="goPanel('stock')" style="padding:4px 10px;font-size:11px">Ver →</button>
-            </div>
-            <div id="dash-stock-bajo"></div>
-          </div>
-          <div class="card">
-            <div class="sec-title" style="margin-bottom:12px"><span class="dot"></span>Top 5 Más Vendidos</div>
-            <div id="dash-top5"></div>
-          </div>
-          <div class="card">
-            <div class="sec-hdr">
-              <div class="sec-title"><span class="dot"></span>Últimas Facturas</div>
-              <button class="btn-t br" onclick="goPanel('facturas')" style="padding:4px 10px;font-size:11px">Ver →</button>
-            </div>
-            <div id="dash-ult-facs"></div>
-          </div>
+        <div class="separator"></div>
+        <div class="title">KAVAJU28</div>
+        <div class="subtitle">— USUARIO > DRACULA —</div>
+        <div class="box">
+          <p>ACCESO RESTRINGIDO</p>
+          <p>SOLO PERSONAL AUTORIZADO</p>
+          <div class="small-separator"></div>
+          <label>INGRESE SU PIN</label>
+          <input type="password" id="pin" maxlength="4" autofocus>
+          <button onclick="login()">[ ENTRAR ]</button>
+          <div id="msg"></div>
         </div>
-        <div class="card">
-          <div class="sec-title" style="margin-bottom:14px"><span class="dot"></span>Acciones Rápidas</div>
-          <div class="quick-actions">
-            <div class="qa-btn" onclick="openModalPresupuesto()"><div class="qa-ico">📋</div><div class="qa-lbl">Nuevo Presupuesto</div></div>
-            <div class="qa-btn" onclick="openModalFactura()"><div class="qa-ico">🧾</div><div class="qa-lbl">Nueva Factura</div></div>
-            <div class="qa-btn" onclick="openModalCliente()"><div class="qa-ico">👤</div><div class="qa-lbl">Nuevo Cliente</div></div>
-            <div class="qa-btn" onclick="openModalGasto()"><div class="qa-ico">💸</div><div class="qa-lbl">Registrar Gasto</div></div>
-          </div>
+        <div class="footer">
+          <span>F1: AYUDA</span>
+          <span>F2: RECUPERAR</span>
+          <span>F10: SALIR</span>
         </div>
       </div>
-      <!-- PRESUPUESTOS -->
-      <div class="panel" id="panel-presupuestos">
-        <div class="tabs">
-          <button class="tab active" onclick="switchTab('presupuestos','todos',this)">Todos</button>
-          <button class="tab" onclick="switchTab('presupuestos','pendiente',this)">Pendientes</button>
-          <button class="tab" onclick="switchTab('presupuestos','aprobado',this)">Aprobados</button>
-          <button class="tab" onclick="switchTab('presupuestos','rechazado',this)">Rechazados</button>
-          <button class="tab" onclick="switchTab('presupuestos','facturado',this)">Facturados</button>
-        </div>
-        <div class="mini-stats" id="presu-mini-stats"></div>
-        <div class="tbl-wrap"><div class="tbl-inner"><table>
-          <thead><tr><th>N°</th><th>Fecha</th><th>Cliente</th><th>Productos</th><th class="r">Exento</th><th class="r">IVA 10</th><th class="r">Total</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody id="tabla-presupuestos"></tbody>
-        </table></div></div>
-      </div>
-      <!-- PEDIDOS -->
-      <div class="panel" id="panel-pedidos">
-        <div class="tabs">
-          <button class="tab active" onclick="switchTab('pedidos','todos',this)">Todos</button>
-          <button class="tab" onclick="switchTab('pedidos','pendiente',this)">Pendientes</button>
-          <button class="tab" onclick="switchTab('pedidos','entregado',this)">Entregados</button>
-          <button class="tab" onclick="switchTab('pedidos','cancelado',this)">Cancelados</button>
-        </div>
-        <div class="mini-stats" id="pedidos-mini-stats"></div>
-        <div class="tbl-wrap"><div class="tbl-inner"><table>
-          <thead><tr><th>N° Pedido</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th class="r">Cant.</th><th class="r">Monto</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody id="tabla-pedidos"></tbody>
-        </table></div></div>
-      </div>
-      <!-- FACTURAS -->
-      <div class="panel" id="panel-facturas">
-        <div class="tabs">
-          <button class="tab active" onclick="switchTab('facturas','todos',this)">Todas</button>
-          <button class="tab" onclick="switchTab('facturas','pagada',this)">Pagadas</button>
-          <button class="tab" onclick="switchTab('facturas','pendiente',this)">Pendientes</button>
-          <button class="tab" onclick="switchTab('facturas','pago_parcial',this)">Parciales</button>
-        </div>
-        <div class="tbl-wrap"><div class="tbl-inner"><table>
-          <thead><tr><th>N° Factura</th><th>Timbrado</th><th>Fecha</th><th>Cliente</th><th class="r">Exento</th><th class="r">IVA 10</th><th class="r">Total</th><th>Condición</th><th>Venc.</th><th>Acciones</th></tr></thead>
-          <tbody id="tabla-facturas"></tbody>
-        </table></div></div>
-      </div>
-      <!-- COBRAR -->
-      <div class="panel" id="panel-cobrar">
-        <div id="cobrar-resumen" style="margin-bottom:16px"></div>
-        <div class="tbl-wrap"><div class="tbl-inner"><table>
-          <thead><tr><th>Factura</th><th>Cliente</th><th class="r">Total</th><th class="r">Pagado</th><th class="r">Saldo</th><th>Vencimiento</th><th>Mora</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody id="tabla-cobrar"></tbody>
-        </table></div></div>
-      </div>
-      <!-- GASTOS -->
-      <div class="panel" id="panel-gastos">
-        <div class="tabs">
-          <button class="tab active" onclick="switchTab('gastos','todos',this)">Todos</button>
-          <button class="tab" onclick="switchTab('gastos','proveedor',this)">Proveedores</button>
-          <button class="tab" onclick="switchTab('gastos','operativo',this)">Operativos</button>
-          <button class="tab" onclick="switchTab('gastos','otro',this)">Otros</button>
-        </div>
-        <div class="mini-stats" id="gastos-mini-stats"></div>
-        <div class="tbl-wrap"><div class="tbl-inner"><table>
-          <thead><tr><th>N°</th><th>Fecha</th><th>Categoría</th><th>Concepto</th><th>Proveedor</th><th class="r">Monto</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody id="tabla-gastos"></tbody>
-        </table></div></div>
-      </div>
-      <!-- STOCK -->
-      <div class="panel" id="panel-stock">
-        <div class="tabs">
-          <button class="tab active" onclick="switchTab('stock','todos',this)">Todos</button>
-          <button class="tab" onclick="switchTab('stock','asuncion',this)">🏪 Asunción</button>
-          <button class="tab" onclick="switchTab('stock','ypacarai',this)">🌿 Ypacaraí</button>
-          <button class="tab" onclick="switchTab('stock','alertas',this)">⚠ Alertas</button>
-        </div>
-        <div id="stock-alerts" style="margin-bottom:10px"></div>
-        <div id="stock-depositos-resumen" style="margin-bottom:14px"></div>
-        <div class="tbl-wrap"><div class="tbl-inner"><table>
-          <thead><tr><th>Código</th><th>Producto</th><th>Categoría</th><th class="r">Asunción</th><th class="r">Ypacaraí</th><th class="r">Total</th><th class="r">Mín.</th><th class="r">P. Venta</th><th>Acciones</th></tr></thead>
-          <tbody id="tabla-stock"></tbody>
-        </table></div></div>
-      </div>
-      <!-- CLIENTES -->
-      <div class="panel" id="panel-clientes">
-        <div class="tbl-wrap"><div class="tbl-inner"><table>
-          <thead><tr><th>Nombre</th><th>RUC / CI</th><th>Teléfono</th><th>Email</th><th>Dirección</th><th>Acciones</th></tr></thead>
-          <tbody id="tabla-clientes"></tbody>
-        </table></div></div>
-      </div>
-      <!-- PRODUCTOS -->
-      <div class="panel" id="panel-productos">
-        <div class="tbl-wrap"><div class="tbl-inner"><table>
-          <thead><tr><th>Código</th><th>Nombre</th><th>Categoría</th><th class="r">P. Costo</th><th class="r">P. Venta</th><th class="r">Asunción</th><th class="r">Ypacaraí</th><th>Acciones</th></tr></thead>
-          <tbody id="tabla-productos"></tbody>
-        </table></div></div>
-      </div>
-      <!-- PROVEEDORES -->
-      <div class="panel" id="panel-proveedores">
-        <div class="tbl-wrap"><div class="tbl-inner"><table>
-          <thead><tr><th>Nombre</th><th>RUC</th><th>Teléfono</th><th>Rubro</th><th>Acciones</th></tr></thead>
-          <tbody id="tabla-proveedores"></tbody>
-        </table></div></div>
-      </div>
     </div>
   </div>
 </div>
-<!-- MODAL PRESUPUESTO -->
-<div class="modal-overlay" id="modal-presupuesto">
-  <div class="modal wide">
-    <div class="modal-title">📋 <span id="modal-presu-title">Nuevo Presupuesto</span></div>
-    <button class="modal-close" onclick="closeModal('modal-presupuesto')">✕</button>
-    <input type="hidden" id="presu-id"/>
-    <div class="form-grid">
-      <div class="fld"><label>Cliente *</label><select id="presu-cliente"></select></div>
-      <div class="fld"><label>Fecha</label><input type="date" id="presu-fecha"/></div>
-      <div class="fld"><label>N° Presupuesto</label><input type="text" id="presu-num" readonly/></div>
-      <div class="fld"><label>Validez (días)</label><input type="number" id="presu-validez" value="7" min="1"/></div>
-      <div class="fld wide"><label>Observaciones / Condiciones</label><input type="text" id="presu-obs" placeholder="Condiciones, notas de pago..."/></div>
-    </div>
-    <div class="items-toolbar"><span class="items-label">Líneas de Productos</span><button class="btn-add-item" onclick="addItemRow('presu')">＋ Agregar producto</button></div>
-    <div class="items-wrap">
-      <div class="items-head"><span>Producto / Descripción</span><span class="tc">Cant.</span><span class="tr">Precio Unit.</span><span class="tr">Desc. Gs.</span><span class="tr">Subtotal</span><span></span></div>
-      <div id="presu-items-body"></div>
-      <div class="items-total-box" id="presu-totals"></div>
-    </div>
-    <div class="btn-row">
-      <button class="btn ghost" onclick="closeModal('modal-presupuesto')">Cancelar</button>
-      <button class="btn primary" onclick="savePresupuesto()">💾 Guardar Presupuesto</button>
-    </div>
-  </div>
-</div>
-<!-- MODAL FACTURA -->
-<div class="modal-overlay" id="modal-factura">
-  <div class="modal wide">
-    <div class="modal-title">🧾 <span id="modal-fac-title">Nueva Factura</span></div>
-    <button class="modal-close" onclick="closeModal('modal-factura')">✕</button>
-    <input type="hidden" id="fac-id"/>
-    <input type="hidden" id="fac-pedido-id"/>
-    <input type="hidden" id="fac-presu-id"/>
-    <div class="form-grid">
-      <div class="fld"><label>Cliente *</label><select id="fac-cliente"></select></div>
-      <div class="fld"><label>Fecha</label><input type="date" id="fac-fecha"/></div>
-      <div class="fld"><label>Timbrado *</label><input type="text" id="fac-timbrado" placeholder="16851126"/></div>
-      <div class="fld"><label>N° Factura (auto)</label><input type="text" id="fac-num-display" readonly/></div>
-      <div class="fld"><label>Vendedor</label><input type="text" id="fac-vendedor" placeholder="Nombre del vendedor..."/></div>
-      <div class="fld"><label>Condición *</label>
-        <select id="fac-condicion" onchange="facCondChanged()">
-          <option value="contado">Contado</option>
-          <option value="credito">Crédito</option>
-        </select>
-      </div>
-      <div class="fld" id="fac-dias-wrap"><label>Días de Crédito</label><input type="number" id="fac-dias" value="30" min="1"/></div>
-      <div class="fld wide"><label>Observaciones</label><input type="text" id="fac-obs" placeholder="Observaciones..."/></div>
-    </div>
-    <div class="items-toolbar"><span class="items-label">Conceptos / Productos</span><button class="btn-add-item" onclick="addItemRow('fac')">＋ Agregar producto</button></div>
-    <div class="items-wrap">
-      <div class="items-head"><span>Producto / Descripción</span><span class="tc">Cant.</span><span class="tr">Precio Unit.</span><span class="tr">Desc. Gs.</span><span class="tr">Subtotal</span><span></span></div>
-      <div id="fac-items-body"></div>
-      <div class="items-total-box" id="fac-totals"></div>
-    </div>
-    <div class="btn-row">
-      <button class="btn ghost" onclick="closeModal('modal-factura')">Cancelar</button>
-      <button class="btn primary" onclick="saveFactura()">💾 Guardar Factura</button>
-    </div>
-  </div>
-</div>
-<!-- MODAL PEDIDO -->
-<div class="modal-overlay" id="modal-pedido">
-  <div class="modal" style="max-width:600px">
-    <div class="modal-title">📦 <span id="modal-ped-title">Nuevo Pedido</span></div>
-    <button class="modal-close" onclick="closeModal('modal-pedido')">✕</button>
-    <input type="hidden" id="ped-id"/>
-    <div class="form-grid">
-      <div class="fld"><label>Cliente *</label><select id="ped-cliente"></select></div>
-      <div class="fld"><label>Fecha</label><input type="date" id="ped-fecha"/></div>
-      <div class="fld"><label>Producto</label><select id="ped-prod" onchange="pedProdSelected()"></select></div>
-      <div class="fld"><label>Depósito</label>
-        <select id="ped-deposito">
-          <option value="asuncion">🏪 Asunción</option>
-          <option value="ypacarai">🌿 Ypacaraí</option>
-        </select>
-      </div>
-      <div class="fld"><label>Cantidad</label><input type="number" id="ped-cant" min="1" value="1" oninput="calcPedMonto()"/></div>
-      <div class="fld"><label>Precio Unit. (Gs.)</label><input type="number" id="ped-precio" min="0" value="0" oninput="calcPedMonto()"/></div>
-      <div class="fld"><label>Monto Total (Gs.)</label><input type="number" id="ped-monto" readonly/></div>
-      <div class="fld wide"><label>Detalle</label><input type="text" id="ped-detalle" placeholder="Descripción del pedido..."/></div>
-      <div class="fld wide"><label>Observaciones</label><textarea id="ped-obs" rows="2"></textarea></div>
-    </div>
-    <div class="btn-row">
-      <button class="btn ghost" onclick="closeModal('modal-pedido')">Cancelar</button>
-      <button class="btn primary" onclick="savePedido()">💾 Guardar Pedido</button>
-    </div>
-  </div>
-</div>
-<!-- MODAL PAGO -->
-<div class="modal-overlay" id="modal-pago">
-  <div class="modal" style="max-width:420px">
-    <div class="modal-title">💰 Registrar Pago de Cliente</div>
-    <button class="modal-close" onclick="closeModal('modal-pago')">✕</button>
-    <input type="hidden" id="pago-fac-id"/>
-    <div class="pago-info-box" id="pago-info"></div>
-    <div class="form-grid">
-      <div class="fld"><label>Monto a Pagar (Gs.) *</label><input type="number" id="pago-monto" min="1" placeholder="0"/></div>
-      <div class="fld"><label>Fecha de Pago</label><input type="date" id="pago-fecha"/></div>
-      <div class="fld wide"><label>Referencia / Método</label><input type="text" id="pago-obs" placeholder="Transferencia, efectivo, cheque..."/></div>
-    </div>
-    <div class="btn-row">
-      <button class="btn ghost" onclick="closeModal('modal-pago')">Cancelar</button>
-      <button class="btn primary" onclick="savePago()">✓ Confirmar Pago</button>
-    </div>
-  </div>
-</div>
-<!-- MODAL GASTO -->
-<div class="modal-overlay" id="modal-gasto">
-  <div class="modal" style="max-width:580px">
-    <div class="modal-title">💸 <span id="modal-gasto-title">Registrar Gasto</span></div>
-    <button class="modal-close" onclick="closeModal('modal-gasto')">✕</button>
-    <input type="hidden" id="gasto-id"/>
-    <div class="form-grid">
-      <div class="fld"><label>Categoría *</label>
-        <select id="gasto-cat">
-          <option value="proveedor">Pago a Proveedor</option>
-          <option value="operativo">Gasto Operativo</option>
-          <option value="otro">Otro</option>
-        </select>
-      </div>
-      <div class="fld"><label>Fecha *</label><input type="date" id="gasto-fecha"/></div>
-      <div class="fld"><label>Proveedor</label><select id="gasto-proveedor"></select></div>
-      <div class="fld"><label>Estado</label>
-        <select id="gasto-estado">
-          <option value="pagado">Pagado</option>
-          <option value="pendiente">Pendiente</option>
-        </select>
-      </div>
-      <div class="fld wide"><label>Concepto *</label><input type="text" id="gasto-concepto" placeholder="Descripción del gasto..."/></div>
-      <div class="fld"><label>Monto (Gs.) *</label><input type="number" id="gasto-monto" min="0" value="0"/></div>
-      <div class="fld"><label>N° Factura / Recibo</label><input type="text" id="gasto-nrofac" placeholder="Referencia..."/></div>
-      <div class="fld wide"><label>Observaciones</label><textarea id="gasto-obs" rows="2" placeholder="Notas adicionales..."></textarea></div>
-    </div>
-    <div class="btn-row">
-      <button class="btn ghost" onclick="closeModal('modal-gasto')">Cancelar</button>
-      <button class="btn primary" onclick="saveGasto()">💾 Guardar Gasto</button>
-    </div>
-  </div>
-</div>
-<!-- MODAL AJUSTE STOCK -->
-<div class="modal-overlay" id="modal-stock-ajuste">
-  <div class="modal" style="max-width:400px">
-    <div class="modal-title">🔧 Ajustar Stock</div>
-    <button class="modal-close" onclick="closeModal('modal-stock-ajuste')">✕</button>
-    <input type="hidden" id="stockaj-prod-id"/>
-    <div id="stockaj-info" class="pago-info-box"></div>
-    <div class="form-grid">
-      <div class="fld"><label>Depósito</label>
-        <select id="stockaj-deposito">
-          <option value="asuncion">🏪 Asunción</option>
-          <option value="ypacarai">🌿 Ypacaraí</option>
-        </select>
-      </div>
-      <div class="fld"><label>Tipo de Movimiento</label>
-        <select id="stockaj-tipo">
-          <option value="add">Ingreso (+)</option>
-          <option value="sub">Egreso (-)</option>
-          <option value="set">Fijar cantidad</option>
-          <option value="transfer">Transferir entre depósitos</option>
-        </select>
-      </div>
-      <div class="fld"><label>Cantidad</label><input type="number" id="stockaj-cant" min="0" value="0"/></div>
-      <div class="fld wide"><label>Motivo</label><input type="text" id="stockaj-motivo" placeholder="Compra, ajuste, venta directa..."/></div>
-    </div>
-    <div class="btn-row">
-      <button class="btn ghost" onclick="closeModal('modal-stock-ajuste')">Cancelar</button>
-      <button class="btn primary" onclick="saveStockAjuste()">✓ Aplicar</button>
-    </div>
-  </div>
-</div>
-<!-- MODAL CLIENTE -->
-<div class="modal-overlay" id="modal-cliente">
-  <div class="modal" style="max-width:500px">
-    <div class="modal-title">👤 <span id="modal-cli-title">Nuevo Cliente</span></div>
-    <button class="modal-close" onclick="closeModal('modal-cliente')">✕</button>
-    <input type="hidden" id="cli-id"/>
-    <div class="form-grid">
-      <div class="fld wide"><label>Nombre / Razón Social *</label><input type="text" id="cli-nombre" placeholder="Nombre completo..."/></div>
-      <div class="fld"><label>RUC / CI</label><input type="text" id="cli-ruc" placeholder="80001234-5"/></div>
-      <div class="fld"><label>Teléfono</label><input type="text" id="cli-tel" placeholder="+595 981..."/></div>
-      <div class="fld wide"><label>Email</label><input type="email" id="cli-email"/></div>
-      <div class="fld wide"><label>Dirección</label><input type="text" id="cli-dir" placeholder="Ciudad, dirección..."/></div>
-    </div>
-    <div class="btn-row">
-      <button class="btn ghost" onclick="closeModal('modal-cliente')">Cancelar</button>
-      <button class="btn primary" onclick="saveCliente()">💾 Guardar</button>
-    </div>
-  </div>
-</div>
-<!-- MODAL PRODUCTO -->
-<div class="modal-overlay" id="modal-producto">
-  <div class="modal" style="max-width:560px">
-    <div class="modal-title">📦 <span id="modal-prod-title">Nuevo Producto</span></div>
-    <button class="modal-close" onclick="closeModal('modal-producto')">✕</button>
-    <input type="hidden" id="prod-id"/>
-    <div class="form-grid">
-      <div class="fld"><label>Código</label><input type="text" id="prod-cod" placeholder="PRD-001"/></div>
-      <div class="fld"><label>Categoría</label><input type="text" id="prod-cat" placeholder="Antiparasitario..."/></div>
-      <div class="fld wide"><label>Nombre *</label><input type="text" id="prod-nombre" placeholder="Nombre del producto..."/></div>
-      <div class="fld"><label>Unidad</label><input type="text" id="prod-unidad" placeholder="L, ml, kg, dosis..."/></div>
-      <div class="fld"><label>P. Costo (Gs.)</label><input type="number" id="prod-costo" min="0" value="0"/></div>
-      <div class="fld"><label>P. Venta (Gs.)</label><input type="number" id="prod-venta" min="0" value="0"/></div>
-      <div class="fld"><label>Stock Asunción</label><input type="number" id="prod-stock-asu" min="0" value="0"/></div>
-      <div class="fld"><label>Stock Ypacaraí</label><input type="number" id="prod-stock-ypa" min="0" value="0"/></div>
-      <div class="fld"><label>Stock Mínimo</label><input type="number" id="prod-min" min="0" value="5"/></div>
-    </div>
-    <div class="btn-row">
-      <button class="btn ghost" onclick="closeModal('modal-producto')">Cancelar</button>
-      <button class="btn primary" onclick="saveProducto()">💾 Guardar</button>
-    </div>
-  </div>
-</div>
-<!-- MODAL PROVEEDOR -->
-<div class="modal-overlay" id="modal-proveedor">
-  <div class="modal" style="max-width:480px">
-    <div class="modal-title">🚚 <span id="modal-prov-title">Nuevo Proveedor</span></div>
-    <button class="modal-close" onclick="closeModal('modal-proveedor')">✕</button>
-    <input type="hidden" id="prov-id"/>
-    <div class="form-grid">
-      <div class="fld wide"><label>Nombre / Razón Social *</label><input type="text" id="prov-nombre" placeholder="Nombre del proveedor..."/></div>
-      <div class="fld"><label>RUC</label><input type="text" id="prov-ruc" placeholder="80001234-5"/></div>
-      <div class="fld"><label>Teléfono</label><input type="text" id="prov-tel" placeholder="+595 981..."/></div>
-      <div class="fld"><label>Email</label><input type="email" id="prov-email"/></div>
-      <div class="fld"><label>Rubro</label><input type="text" id="prov-rubro" placeholder="Veterinaria, alimentación..."/></div>
-      <div class="fld wide"><label>Dirección</label><input type="text" id="prov-dir"/></div>
-    </div>
-    <div class="btn-row">
-      <button class="btn ghost" onclick="closeModal('modal-proveedor')">Cancelar</button>
-      <button class="btn primary" onclick="saveProveedor()">💾 Guardar</button>
-    </div>
-  </div>
-</div>
-<!-- PRINT OVERLAY -->
-<div id="print-overlay">
-  <div class="print-toolbar">
-    <span id="print-toolbar-title">📄 Documento</span>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="tbtn tbtn-print" onclick="window.print()">🖨 Imprimir / PDF</button>
-      <button class="tbtn tbtn-whatsapp" id="btn-share-img" onclick="generarImagen()">📲 Imagen WhatsApp</button>
-      <button class="tbtn tbtn-close" onclick="closePrint()">✕ Cerrar</button>
-    </div>
-  </div>
-  <div id="share-img-wrap" style="display:none;background:#2a2520;padding:16px;text-align:center">
-    <div style="color:#9e968e;font-size:12px;margin-bottom:10px">📲 Mantené presionada la imagen → Compartir → WhatsApp</div>
-    <img id="share-img" style="max-width:100%;border-radius:8px" alt=""/>
-  </div>
-  <div id="print-body"></div>
-</div>
-<script src="storage.js"></script>
-<script src="app.js"></script>
+<script>
+function login(){
+  const pin = document.getElementById("pin").value;
+  const msg = document.getElementById("msg");
+  if(pin === "3335"){
+    msg.innerHTML = "ABRAZO FRANJEADO";
+    setTimeout(function(){ window.location.href = "/sistema.html"; }, 1000);
+  } else {
+    msg.innerHTML = "PIN INCORRECTO";
+  }
+}
+document.getElementById("pin").addEventListener("keydown", function(e){
+  if(e.key === "Enter") login();
+});
+</script>
 </body>
 </html>
