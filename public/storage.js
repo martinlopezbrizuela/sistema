@@ -1,43 +1,33 @@
-const BIN_ID = "6a090b2fadc21f119aaf5293";
-const API_KEY = "$2a$10$7rFsw/Rs1i.Z39Kt2LYdVuNmfJc0OR5xy706GRKw28q1wUi3tVChK";
+const RAILWAY_URL = "https://sistema-sistema.up.railway.app";
 
 let _saveTimeout = null;
 
 async function loadCloud() {
   try {
-    const response = await fetch(
-      `https://api.jsonbin.io/v3/b/${BIN_ID}/latest`,
-      { headers: { "X-Master-Key": API_KEY } }
-    );
-    const data = await response.json();
-    return data.record;
-  } catch(error) {
-    console.error("loadCloud error:", error);
+    const res = await fetch(`${RAILWAY_URL}/api/data`);
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const data = await res.json();
+    console.log('☁️ Datos cargados desde Railway');
+    return data;
+  } catch (err) {
+    console.warn('⚠️ loadCloud error:', err.message);
     return null;
   }
 }
 
 async function saveCloud(data) {
-  // Debounce: espera 1.5s antes de guardar para no spamear la API
   if (_saveTimeout) clearTimeout(_saveTimeout);
   _saveTimeout = setTimeout(async () => {
     try {
-      const response = await fetch(
-        `https://api.jsonbin.io/v3/b/${BIN_ID}`,
-        {
-          method: "PUT",
-          headers: {
-            "Content-Type": "application/json",
-            "X-Master-Key": API_KEY
-          },
-          body: JSON.stringify(data)
-        }
-      );
-      if (!response.ok) {
-        console.error("saveCloud error:", response.status);
-      }
-    } catch(error) {
-      console.error("saveCloud error:", error);
+      const res = await fetch(`${RAILWAY_URL}/api/data`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      console.log('💾 Guardado en Railway ✓');
+    } catch (err) {
+      console.warn('⚠️ saveCloud error:', err.message);
     }
   }, 1500);
 }
