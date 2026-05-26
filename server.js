@@ -1,3 +1,5 @@
+Copiá todo esto y reemplazá el server.js completo:
+
 const express = require('express');
 const { Pool } = require('pg');
 const app = express();
@@ -5,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(express.static('public'));
+app.use(express.static('.'));
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
@@ -74,7 +76,7 @@ app.get('/api/health', async (req, res) => {
 });
 
 app.get('*', (req, res) => {
-  res.sendFile('index.html', { root: 'public' });
+  res.sendFile('index.html', { root: '.' });
 });
 
 initDB().then(() => {
@@ -82,3 +84,6 @@ initDB().then(() => {
     console.log(`🐴 Kavaju ERP corriendo en puerto ${PORT}`);
   });
 });
+
+
+Avisame cuando lo subiste.
