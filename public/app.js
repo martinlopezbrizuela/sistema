@@ -1476,5 +1476,11 @@ saveAll = function(){
   saveAllLocal();
   if(typeof saveCloud === "function"){ saveCloud(getERPData()); }
 };
-;
-setTimeout(()=>{ cargarDesdeNube(); }, 800);
+;document.addEventListener('DOMContentLoaded', async () => {
+  await cargarDesdeNube();
+
+  renderPanel(activePanel);
+  updateSidebar();
+
+  console.log('☁️ Sistema sincronizado con Railway');
+});
