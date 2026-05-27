@@ -1470,7 +1470,6 @@ function setERPData(data){
 async function cargarDesdeNube(){
   const data = await loadCloud();
   if(data && Object.keys(data).length){ setERPData(data); }
-  else { await saveCloud(getERPData()); toast("Base inicial subida a JSONBin ✓"); }
 }
 const saveAllLocal = saveAll;
 saveAll = function(){
