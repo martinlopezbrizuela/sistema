@@ -1462,7 +1462,7 @@ function setERPData(data){
   saveAll();
   renderPanel(activePanel);
   updateSidebar();
-  toast("Datos cargados desde JSONBin ✓");
+toast("Datos sincronizados con Railway ✓");
 }
 async function cargarDesdeNube(){
   const data = await loadCloud();
