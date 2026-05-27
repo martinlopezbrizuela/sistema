@@ -1435,7 +1435,6 @@ function cargarDemo() {
 // INIT
 // ═══════════════════════════════
 function init() {
-  load();
   cargarDemo();
   document.querySelectorAll('.modal-overlay').forEach(mo => {
     mo.addEventListener('click', e => { if(e.target===mo) mo.classList.remove('open'); });
@@ -1443,8 +1442,6 @@ function init() {
   facCondChanged();
   goPanel('dashboard');
 }
-
-init();
 
 /* ═══════════════════════════════
    JSONBIN SYNC
