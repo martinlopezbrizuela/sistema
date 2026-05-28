@@ -1333,9 +1333,8 @@ function buildFacturaHTML(f) {
       <div class="tr2"><span>Subtotal Exento:</span><span>Gs. ${fmt(tots.exento)}</span></div>
       <div class="tr2"><span>IVA 10% (incluido):</span><span>Gs. ${fmt(tots.iva)}</span></div>
       <div class="tr2 grand"><span>TOTAL A COBRAR:</span><span>Gs. ${fmt(tots.total)}</span></div>
-    </div></div>
-        <div style="padding:8px 24px;border-top:2px solid #333;background:#f9f9f9"><table style="width:100%;border-collapse:collapse;font-size:12px;font-weight:700"><tr><td style="padding:6px 12px;border:1px solid #bbb">LIQUIDACIÓN DE IVA</td><td style="padding:6px 12px;border:1px solid #bbb">5%: &nbsp;0</td><td style="padding:6px 12px;border:1px solid #bbb">10%: &nbsp;Gs. ${fmt(tots.iva)}</td><td style="padding:6px 12px;border:1px solid #bbb">TOTAL IVA: &nbsp;Gs. ${fmt(tots.iva)}</td></tr></table></div>
-    <div class="foot">Agropecuaria Kavaju E.A.S. | RUC: 80148174-0 | Asunción, Paraguay | Comprobante fiscal</div>
+    </div></div>    <div style="padding:8px 24px;border-top:2px solid #333;background:#f9f9f9"><table style="width:100%;border-collapse:collapse;font-size:12px;font-weight:700"><tr><td style="padding:6px 12px;border:1px solid #bbb">LIQUIDACION DE IVA</td><td style="padding:6px 12px;border:1px solid #bbb">5%: 0</td><td style="padding:6px 12px;border:1px solid #bbb">10%: Gs. ${fmt(tots.iva)}</td><td style="padding:6px 12px;border:1px solid #bbb">TOTAL IVA: Gs. ${fmt(tots.iva)}</td></tr></table></div>
+  <div class="foot">Agropecuaria Kavaju E.A.S. | RUC: 80148174-0 | Asunción, Paraguay | Comprobante fiscal</div>
   </div>`;
 }
 
