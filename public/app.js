@@ -385,10 +385,8 @@ function renderItemRows(type) {
           style="width:100%;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--ff);color:var(--text);outline:none">
         <div id="drop-${type}-${r.id}" class="prod-dropdown" style="display:none"></div>
       </div>
-      <div class="item-cell"><input type="number" class="tc" min="0" value="${r.cant}"
-        oninput="onItemChange('${type}',${r.id},'cant',this.value)"></div>
-      <div class="item-cell"><input type="number" class="tr" min="0" value="${r.precio}"
-        oninput="onItemChange('${type}',${r.id},'precio',this.value)"></div>
+           <div class="item-cell"><input type="text" inputmode="numeric" pattern="[0-9]*" class="tc" value="${r.cant}" onfocus="this.select()" onchange="onItemChange('${type}',${r.id},'cant',this.value)" onblur="onItemChange('${type}',${r.id},'cant',this.value)" style="width:100%;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--fm);color:var(--text);text-align:center;outline:none"></div>
+      <div class="item-cell"><input type="text" inputmode="numeric" pattern="[0-9]*" class="tr" value="${r.precio}" onfocus="this.select()" onchange="onItemChange('${type}',${r.id},'precio',this.value)" onblur="onItemChange('${type}',${r.id},'precio',this.value)" style="width:100%;padding:6px 8px;background:var(--card);border:1px solid var(--border);border-radius:6px;font-size:12px;font-family:var(--fm);color:var(--text);text-align:right;outline:none"></div>
       <div class="item-readonly">Gs.${fmt(exento)}</div>
       <div class="item-readonly iva">Gs.${fmt(iva)}</div>
       <div><button class="item-del-btn" onclick="delItemRow('${type}',${r.id})">✕</button></div>
