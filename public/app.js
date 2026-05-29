@@ -292,7 +292,9 @@ function renderDashboard() {
         <div><div style="font-family:var(--fm);font-size:11px;color:var(--g2)">${f.num}</div><div style="color:var(--text2);font-size:11px">${he(nomCli(f.clienteId))}</div></div>
         <div style="text-align:right"><div style="font-family:var(--fm);font-weight:700;font-size:12px">Gs. ${fmt(f.total)}</div><div>${badgeFac(f.estado)}</div></div>
       </div>`).join('')
-    : `<div class="empty" style="padding:18px"><div class="icon">🧾</div>Sin facturas</div>`;
+    : `<div class="empty" style="padding:18px"><div class="icon">🧾</div>Sin facturas</div>`;  renderPieCat();
+  renderMeta();
+
 }
 
 function pieSlice(pct, offset, color) {
