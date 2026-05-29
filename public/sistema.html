@@ -69,7 +69,25 @@
         <div class="dash-grid">
           <div class="card">
             <div class="sec-hdr">
-              <div class="sec-title"><span class="dot"></span>Stock Bajo / Sin Stock</div>
+                     <div class="dash-grid">
+          <div class="card span2">
+            <div class="sec-hdr">
+              <div class="sec-title"><span class="dot"></span>Ventas por Categoría</div>
+            </div>
+            <div id="dash-pie-cat"></div>
+          </div>
+          <div class="card span2">
+            <div class="sec-hdr">
+              <div class="sec-title"><span class="dot"></span>🏇 Meta Mensual de Ventas</div>
+              <div style="display:flex;align-items:center;gap:8px">
+                <span style="font-size:11px;color:var(--text3)">Meta Gs.</span>
+                <input type="number" id="meta-input" style="width:150px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-family:var(--fm);font-size:12px;background:var(--card);color:var(--text)" placeholder="400000000" oninput="saveMeta()"/>
+              </div>
+            </div>
+            <div id="dash-meta"></div>
+          </div>
+        </div>
+ <div class="sec-title"><span class="dot"></span>Stock Bajo / Sin Stock</div>
               <button class="btn-t br" onclick="goPanel('stock')" style="padding:4px 10px;font-size:11px">Ver →</button>
             </div>
             <div id="dash-stock-bajo"></div>
