@@ -26,7 +26,6 @@ const K = {
 // ── STATE ──
 let presus=[], pedidos=[], facturas=[], clientes=[], productos=[], proveedores=[], gastos=[];
 let counters = { presu:1, ped:1, fac:1, gasto:1 };
-let metaMensual = 400000000;
 let activePanel = 'dashboard';
 let tabFilters = { presupuestos:'todos', pedidos:'todos', facturas:'todos', gastos:'todos', stock:'todos' };
 let itemsPresu = [], itemsFac = [];
@@ -292,104 +291,8 @@ function renderDashboard() {
         <div><div style="font-family:var(--fm);font-size:11px;color:var(--g2)">${f.num}</div><div style="color:var(--text2);font-size:11px">${he(nomCli(f.clienteId))}</div></div>
         <div style="text-align:right"><div style="font-family:var(--fm);font-weight:700;font-size:12px">Gs. ${fmt(f.total)}</div><div>${badgeFac(f.estado)}</div></div>
       </div>`).join('')
-    : `<div class="empty" style="padding:18px"><div class="icon">🧾</div>Sin facturas</div>`;  renderPieCat();
-  renderMeta();
-
+    : `<div class="empty" style="padding:18px"><div class="icon">🧾</div>Sin facturas</div>`;
 }
-Buscá la línea 300:
-
-function pieSlice(pct, offset, color) {
-
-
-Y pegá justo antes todo esto:
-
-function saveMeta() {
-  const v = parseInt(document.getElementById('meta-input').value) || 400000000;
-  metaMensual = v;
-  saveAll();
-  renderMeta();
-}
-
-function renderPieCat() {
-  const el = document.getElementById('dash-pie-cat');
-  if (!el) return;
-  const catTotals = {};
-  facturas.forEach(f => {
-    (f.items || []).forEach(it => {
-      const prod = productos.find(p => p.id === it.prodId);
-      const cat = (prod && prod.categoria) ? prod.categoria : 'Sin categoría';
-      catTotals[cat] = (catTotals[cat] || 0) + Number(it.cant || 0) * Number(it.precio || 0);
-    });
-  });
-  const entries = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
-  if (!entries.length) {
-    el.innerHTML = `<div class="empty" style="padding:18px"><div class="icon">📊</div>Sin datos de ventas por categoría</div>`;
-    return;
-  }
-  const total = entries.reduce((s, [, v]) => s + v, 0);
-  const colors = ['#7B4A2D','#27ae60','#e67e22','#2980b9','#8e44ad','#e74c3c','#16a085','#f39c12','#2c3e50','#d35400'];
-  let offset = 0;
-  const slices = entries.map(([cat, val], i) => {
-    const pct = Math.round(val / total * 100);
-    const s = pieSlice(pct, offset, colors[i % colors.length]);
-    offset += pct;
-    return { cat, val, pct, color: colors[i % colors.length], s };
-  });
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:24px;flex-wrap:wrap;padding:8px 0">
-      <svg width="120" height="120" viewBox="0 0 36 36">
-        ${slices.map(s => s.s).join('')}
-        <circle cx="18" cy="18" r="10" fill="var(--card)"/>
-      </svg>
-      <div style="flex:1;min-width:180px">
-        ${slices.map(s => `
-          <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid var(--border);font-size:12px">
-            <div style="display:flex;align-items:center;gap:6px">
-              <div style="width:10px;height:10px;border-radius:50%;background:${s.color};flex-shrink:0"></div>
-              <span style="color:var(--text2)">${he(s.cat)}</span>
-            </div>
-            <div style="text-align:right">
-              <span style="font-family:var(--fm);font-weight:700;color:var(--g2)">Gs.${fmt(s.val)}</span>
-              <span style="color:var(--text3);margin-left:6px">${s.pct}%</span>
-            </div>
-          </div>`).join('')}
-        <div style="display:flex;justify-content:space-between;padding:6px 0;font-size:12px;font-weight:700">
-          <span>TOTAL</span><span style="font-family:var(--fm);color:var(--g2)">Gs.${fmt(total)}</span>
-        </div>
-      </div>
-    </div>`;
-}
-
-function renderMeta() {
-  const el = document.getElementById('dash-meta');
-  if (!el) return;
-  const inp = document.getElementById('meta-input');
-  if (inp && !inp.value) inp.value = metaMensual;
-  const mes = mesActual();
-  const ventasMes = facturas.filter(f => f.fecha && f.fecha.startsWith(mes)).reduce((s, f) => s + Number(f.total || 0), 0);
-  const pct = Math.min(Math.round(ventasMes / metaMensual * 100), 100);
-  const color = pct >= 100 ? '#27ae60' : pct >= 60 ? '#e67e22' : '#e74c3c';
-  const horsePos = Math.min(pct, 96);
-  el.innerHTML = `
-    <div style="padding:8px 0 16px">
-      <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:8px">
-        <span style="color:var(--text3)">Vendido: <strong style="color:var(--g2);font-family:var(--fm)">Gs.${fmt(ventasMes)}</strong></span>
-        <span style="color:var(--text3)">Meta: <strong style="font-family:var(--fm)">Gs.${fmt(metaMensual)}</strong></span>
-        <span style="font-weight:700;color:${color}">${pct}%</span>
-      </div>
-      <div style="position:relative;height:36px;background:var(--bg);border-radius:18px;overflow:hidden;border:1px solid var(--border)">
-        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${color}88,${color});border-radius:18px;transition:width .6s ease"></div>
-        <div style="position:absolute;top:50%;left:calc(${horsePos}% - 16px);transform:translateY(-50%);font-size:22px;transition:left .6s ease;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))">[H]</div>
-            <div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:18px">[META]</div>
-
-      </div>
-      <div style="margin-top:8px;font-size:11px;color:var(--text3);text-align:center">
-         ${pct >= 100 ? 'Meta alcanzada! Excelente trabajo.' : `Faltan Gs.${fmt(Math.max(0, metaMensual - ventasMes))} para la meta`}
-      </div>
-    </div>`;
-}
-
-
 
 function pieSlice(pct, offset, color) {
   if (pct<=0) return '';
@@ -1542,7 +1445,7 @@ function init() {
    JSONBIN SYNC
 ═══════════════════════════════ */
 function getERPData(){
-  return { presus, pedidos, facturas, clientes, productos, proveedores, gastos, counters, metaMensual };
+  return { presus, pedidos, facturas, clientes, productos, proveedores, gastos, counters };
 }
 function setERPData(data){
   if(!data) return;
@@ -1554,7 +1457,6 @@ function setERPData(data){
   proveedores = data.proveedores || [];
   gastos      = data.gastos      || [];
   counters    = data.counters    || counters;
-    metaMensual = data.metaMensual || 400000000;
   saveAll();
   renderPanel(activePanel);
   updateSidebar();
