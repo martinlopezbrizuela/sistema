@@ -26,6 +26,7 @@ const K = {
 // ── STATE ──
 let presus=[], pedidos=[], facturas=[], clientes=[], productos=[], proveedores=[], gastos=[];
 let counters = { presu:1, ped:1, fac:1, gasto:1 };
+let metaMensual = 400000000;
 let activePanel = 'dashboard';
 let tabFilters = { presupuestos:'todos', pedidos:'todos', facturas:'todos', gastos:'todos', stock:'todos' };
 let itemsPresu = [], itemsFac = [];
