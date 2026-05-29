@@ -379,7 +379,7 @@ function renderMeta() {
       </div>
       <div style="position:relative;height:36px;background:var(--bg);border-radius:18px;overflow:hidden;border:1px solid var(--border)">
         <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${color}88,${color});border-radius:18px;transition:width .6s ease"></div>
-        <div style="position:absolute;top:50%;left:calc(${horsePos}% - 16px);transform:translateY(-50%);font-size:22px;transition:left .6s ease;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))">🏇</div>
+        <div style="position:absolute;top:50%;left:calc(${horsePos}% - 16px);transform:translateY(-50%);font-size:22px;transition:left .6s ease;filter:drop-shadow(0 1px 2px rgba(0,0,0,.3))">[H]</div>
             <div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:18px">[META]</div>
 
       </div>
