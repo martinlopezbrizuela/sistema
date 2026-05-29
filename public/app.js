@@ -9,7 +9,7 @@
     el.innerHTML=''; el.appendChild(img);
   }
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',inject):inject();
-})();
+})(); 
 
 // ── STORAGE KEYS ──
 const K = {
