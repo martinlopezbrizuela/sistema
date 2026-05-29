@@ -1445,7 +1445,7 @@ function init() {
    JSONBIN SYNC
 ═══════════════════════════════ */
 function getERPData(){
-  return { presus, pedidos, facturas, clientes, productos, proveedores, gastos, counters };
+  return { presus, pedidos, facturas, clientes, productos, proveedores, gastos, counters, metaMensual };
 }
 function setERPData(data){
   if(!data) return;
