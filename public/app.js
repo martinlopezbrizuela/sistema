@@ -1457,6 +1457,7 @@ function setERPData(data){
   proveedores = data.proveedores || [];
   gastos      = data.gastos      || [];
   counters    = data.counters    || counters;
+    metaMensual = data.metaMensual || 400000000;
   saveAll();
   renderPanel(activePanel);
   updateSidebar();
