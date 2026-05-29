@@ -383,7 +383,7 @@ function renderMeta() {
         <div style="position:absolute;right:8px;top:50%;transform:translateY(-50%);font-size:18px">🏁</div>
       </div>
       <div style="margin-top:8px;font-size:11px;color:var(--text3);text-align:center">
-        ${pct >= 100 ? '🏆 ¡Meta alcanzada! Excelente trabajo.' : `Faltan Gs.${fmt(Math.max(0, metaMensual - ventasMes))} para la meta`}
+         ${pct >= 100 ? 'Meta alcanzada! Excelente trabajo.' : `Faltan Gs.${fmt(Math.max(0, metaMensual - ventasMes))} para la meta`}
       </div>
     </div>`;
 }
