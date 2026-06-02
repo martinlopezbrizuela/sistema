@@ -103,7 +103,7 @@
             <div class="qa-btn" onclick="openModalPresupuesto()"><div class="qa-ico">📋</div><div class="qa-lbl">Nuevo Presupuesto</div></div>
             <div class="qa-btn" onclick="openModalFactura()"><div class="qa-ico">🧾</div><div class="qa-lbl">Nueva Factura</div></div>
             <div class="qa-btn" onclick="openModalCliente()"><div class="qa-ico">👤</div><div class="qa-lbl">Nuevo Cliente</div></div>
-            <div class="qa-btn" onclick="openModalGasto()"><div class="qa-ico">💸</div><div class="qa-lbl">Registrar Gasto</div></div>
+            <div class="qa-btn" onclick="goPanel('agenda');setTimeout(openModalAgenda,100)"><div class="qa-ico">📅</div><div class="qa-lbl">Cargar Pago</div></div>
           </div>
         </div>
       </div>
@@ -159,6 +159,9 @@
       </div>
       <!-- GASTOS -->
       <div class="panel" id="panel-gastos">
+        <div style="background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 16px;margin-bottom:12px;font-size:12px;color:var(--text3)">
+          📋 Historial de pagos — los registros se generan automáticamente al marcar pagos en la <strong style="color:var(--g2);cursor:pointer" onclick="goPanel('agenda')">Agenda de Pagos</strong>
+        </div>
         <div class="tabs">
           <button class="tab active" onclick="switchTab('gastos','todos',this)">Todos</button>
           <button class="tab" onclick="switchTab('gastos','proveedor',this)">Proveedores</button>
@@ -167,7 +170,7 @@
         </div>
         <div class="mini-stats" id="gastos-mini-stats"></div>
         <div class="tbl-wrap"><div class="tbl-inner"><table>
-          <thead><tr><th>N°</th><th>Fecha</th><th>Categoría</th><th>Concepto</th><th>Proveedor</th><th class="r">Monto</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <thead><tr><th>N°</th><th>Fecha</th><th>Categoría</th><th>Concepto</th><th>Proveedor</th><th class="r">Monto</th><th>Estado</th></tr></thead>
           <tbody id="tabla-gastos"></tbody>
         </table></div></div>
       </div>
