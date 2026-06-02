@@ -9,7 +9,7 @@
     el.innerHTML=''; el.appendChild(img);
   }
   document.readyState==='loading'?document.addEventListener('DOMContentLoaded',inject):inject();
-})(); 
+})();
 
 // ── STORAGE KEYS ──
 const K = {
@@ -21,11 +21,13 @@ const K = {
   proveedores: 'kv_proveedores_v3',
   gastos:      'kv_gastos_v3',
   counters:    'kv_counters_v3',
+  agenda:      'kv_agenda_v1',
 };
 
 // ── STATE ──
-let presus=[], pedidos=[], facturas=[], clientes=[], productos=[], proveedores=[], gastos=[];
+let presus=[], pedidos=[], facturas=[], clientes=[], productos=[], proveedores=[], gastos=[], agenda=[];
 let counters = { presu:1, ped:1, fac:1, gasto:1 };
+let metaMensual = 400000000;
 let activePanel = 'dashboard';
 let tabFilters = { presupuestos:'todos', pedidos:'todos', facturas:'todos', gastos:'todos', stock:'todos' };
 let itemsPresu = [], itemsFac = [];
@@ -39,6 +41,7 @@ function load() {
   productos   = JSON.parse(localStorage.getItem(K.productos)   || '[]');
   proveedores = JSON.parse(localStorage.getItem(K.proveedores) || '[]');
   gastos      = JSON.parse(localStorage.getItem(K.gastos)      || '[]');
+  agenda      = JSON.parse(localStorage.getItem(K.agenda)      || '[]');
   counters    = JSON.parse(localStorage.getItem(K.counters)    || JSON.stringify(counters));
 }
 function saveAll() {
@@ -49,6 +52,7 @@ function saveAll() {
   localStorage.setItem(K.productos,   JSON.stringify(productos));
   localStorage.setItem(K.proveedores, JSON.stringify(proveedores));
   localStorage.setItem(K.gastos,      JSON.stringify(gastos));
+  localStorage.setItem(K.agenda,      JSON.stringify(agenda));
   localStorage.setItem(K.counters,    JSON.stringify(counters));
 }
 function nextNum(key, prefix, pad) {
@@ -141,6 +145,7 @@ const panelTitles = {
   cobrar:'Cuentas a Cobrar', gastos:'Gastos / Egresos',
   stock:'Stock / Inventario', clientes:'Clientes',
   productos:'Productos', proveedores:'Proveedores',
+  agenda:'Agenda de Pagos',
 };
 const topbarMap = {
   dashboard:    { lbl:'＋ Presupuesto',    fn:'openModalPresupuesto' },
@@ -153,6 +158,7 @@ const topbarMap = {
   clientes:     { lbl:'＋ Nuevo Cliente',   fn:'openModalCliente' },
   productos:    { lbl:'＋ Nuevo Producto',  fn:'openModalProducto' },
   proveedores:  { lbl:'＋ Nuevo Proveedor', fn:'openModalProveedor' },
+  agenda:       { lbl:'＋ Nuevo Pago',      fn:'openModalAgenda' },
 };
 
 function goPanel(id) {
@@ -185,6 +191,7 @@ function renderPanel(id) {
     case 'clientes':     renderClientes();     break;
     case 'productos':    renderProductos();    break;
     case 'proveedores':  renderProveedores();  break;
+    case 'agenda':       renderAgenda();       break;
   }
 }
 function switchTab(panel, filter, el) {
@@ -210,6 +217,11 @@ function updateSidebar() {
   const sk = document.getElementById('sbb-stock');
   if (ss) { sk.textContent=ss; sk.style.display=''; sk.className='sbadge '+(productos.some(p=>stockTotal(p)<=0)?'red':'amber'); }
   else sk.style.display='none';
+  // Badge agenda — pagos vencidos o que vencen hoy
+  const hoyStr = today();
+  const agVenc = (agenda||[]).filter(a=>a.estado==='pendiente'&&a.fecha<=hoyStr).length;
+  const sa = document.getElementById('sbb-agenda');
+  if (sa) { if(agVenc){sa.textContent=agVenc;sa.style.display='';}else sa.style.display='none'; }
 }
 
 // ═══════════════════════════════
@@ -240,6 +252,20 @@ function renderDashboard() {
   const sinStock = productos.filter(p=>stockTotal(p)<=0).length;
   if (sinStock) ab.innerHTML += `<div class="alert-box red">🔴 <strong>${sinStock}</strong> producto(s) sin stock. <button class="btn-t g" onclick="goPanel('stock')" style="margin-left:8px">Ver →</button></div>`;
   if (presuPend) ab.innerHTML += `<div class="alert-box amber">📋 <strong>${presuPend}</strong> presupuesto(s) esperando respuesta. <button class="btn-t g" onclick="goPanel('presupuestos')" style="margin-left:8px">Ver →</button></div>`;
+  // Alerta agenda de pagos — hoy y próximos 3 días
+  const hoy = today();
+  const en3 = new Date(); en3.setDate(en3.getDate()+3);
+  const en3str = en3.toISOString().slice(0,10);
+  const pagosHoy = (agenda||[]).filter(a=>a.fecha===hoy&&a.estado==='pendiente');
+  const pagosPronto = (agenda||[]).filter(a=>a.fecha>hoy&&a.fecha<=en3str&&a.estado==='pendiente');
+  if (pagosHoy.length) {
+    const montoHoy = pagosHoy.reduce((s,a)=>s+Number(a.monto||0),0);
+    ab.innerHTML += `<div class="alert-box red">💳 <strong>HOY vencen ${pagosHoy.length} pago(s)</strong> por Gs. ${fmt(montoHoy)}. <button class="btn-t b" onclick="goPanel('agenda')" style="margin-left:8px">Ver agenda →</button></div>`;
+  }
+  if (pagosPronto.length) {
+    const montoPronto = pagosPronto.reduce((s,a)=>s+Number(a.monto||0),0);
+    ab.innerHTML += `<div class="alert-box amber">📅 <strong>${pagosPronto.length} pago(s)</strong> próximos 3 días — Gs. ${fmt(montoPronto)}. <button class="btn-t g" onclick="goPanel('agenda')" style="margin-left:8px">Ver →</button></div>`;
+  }
 
   const meses6=[]; const now=new Date();
   for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);meses6.push({key:d.toISOString().slice(0,7),lbl:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()]});}
@@ -1499,11 +1525,273 @@ function init() {
   goPanel('dashboard');
 }
 
-/* ═══════════════════════════════
-   JSONBIN SYNC
-═══════════════════════════════ */
+// ═══════════════════════════════
+// AGENDA DE PAGOS
+// ═══════════════════════════════
+function renderAgenda() {
+  const hoy = today();
+  const now = new Date();
+  // Mes visible (puede cambiar con navegación)
+  if (!window._agendaMes) window._agendaMes = hoy.slice(0,7);
+  const mes = window._agendaMes;
+  const [yy, mm] = mes.split('-').map(Number);
+  const primerDia = new Date(yy, mm-1, 1);
+  const ultimoDia = new Date(yy, mm, 0);
+  const diasMes = ultimoDia.getDate();
+  const iniciaSemana = primerDia.getDay(); // 0=Dom
+  const nomMeses = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+
+  // Agrupar agenda por fecha
+  const byFecha = {};
+  (agenda||[]).forEach(a => {
+    if (!byFecha[a.fecha]) byFecha[a.fecha] = [];
+    byFecha[a.fecha].push(a);
+  });
+
+  // Stats del mes
+  const agendaMes = (agenda||[]).filter(a=>a.fecha&&a.fecha.startsWith(mes));
+  const totalPend = agendaMes.filter(a=>a.estado==='pendiente').reduce((s,a)=>s+Number(a.monto||0),0);
+  const totalPagado = agendaMes.filter(a=>a.estado==='pagado').reduce((s,a)=>s+Number(a.monto||0),0);
+  const nPend = agendaMes.filter(a=>a.estado==='pendiente').length;
+  const nVenc = agendaMes.filter(a=>a.estado==='pendiente'&&a.fecha<hoy).length;
+
+  // Calendario
+  let calHtml = '<div class="agenda-cal-grid">';
+  ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'].forEach(d => {
+    calHtml += `<div class="cal-head">${d}</div>`;
+  });
+  // Celdas vacías inicio
+  for(let i=0;i<iniciaSemana;i++) calHtml += '<div class="cal-cell empty"></div>';
+  for(let d=1;d<=diasMes;d++) {
+    const fStr = `${mes}-${String(d).padStart(2,'0')}`;
+    const items = byFecha[fStr]||[];
+    const pendItems = items.filter(a=>a.estado==='pendiente');
+    const esHoy = fStr===hoy;
+    const hayVenc = pendItems.some(a=>a.fecha<hoy);
+    let dotHtml = '';
+    if (pendItems.length) {
+      const color = fStr<hoy?'#e74c3c':fStr===hoy?'#c8a84b':'#27ae60';
+      dotHtml = `<span class="cal-dot" style="background:${color}">${pendItems.length}</span>`;
+    }
+    calHtml += `<div class="cal-cell${esHoy?' cal-hoy':''}" onclick="filtrarAgendaDia('${fStr}')">
+      <span class="cal-num">${d}</span>${dotHtml}
+    </div>`;
+  }
+  calHtml += '</div>';
+
+  // Lista de pagos del mes ordenada por fecha
+  const listData = [...agendaMes].sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const tipoIco = {cheque:'🧾',efectivo:'💵',transferencia:'🏦',cuota:'📅'};
+  const tipoLbl = {cheque:'Cheque',efectivo:'Efectivo',transferencia:'Transferencia',cuota:'Cuota'};
+
+  let listaHtml = '';
+  if (!listData.length) {
+    listaHtml = `<div class="empty" style="padding:24px"><div class="icon">📅</div>Sin pagos en ${nomMeses[mm-1]}</div>`;
+  } else {
+    // Agrupar por fecha para mostrar separadores
+    let fechaActual = '';
+    listData.forEach(a => {
+      if (a.fecha !== fechaActual) {
+        fechaActual = a.fecha;
+        const esHoyLabel = a.fecha===hoy?' (HOY)':'';
+        const esPasado = a.fecha<hoy;
+        listaHtml += `<div class="agenda-fecha-sep${esPasado?' pasado':''}">${fmtD(a.fecha)}${esHoyLabel}</div>`;
+      }
+      const venc = a.estado==='pendiente'&&a.fecha<hoy;
+      listaHtml += `<div class="agenda-item${venc?' vencido':''}">
+        <div class="ag-ico">${tipoIco[a.tipo]||'💰'}</div>
+        <div class="ag-info">
+          <div class="ag-concepto">${he(a.concepto||'—')}</div>
+          <div class="ag-meta">${tipoLbl[a.tipo]||a.tipo}${a.nroCheque?' · N°'+he(a.nroCheque):''}${a.proveedor?' · '+he(a.proveedor):''}</div>
+        </div>
+        <div class="ag-monto">Gs. ${fmt(a.monto)}</div>
+        <div class="ag-estado">
+          ${a.estado==='pagado'
+            ? `<span class="badge green">Pagado</span>`
+            : `<button class="btn-t g" onclick="pagarAgenda(${a.id})" style="font-size:10px;padding:3px 8px">✓ Pagar</button>`
+          }
+        </div>
+        <div class="ag-acc">
+          <button class="btn-t gr" onclick="editAgenda(${a.id})">✏</button>
+          <button class="btn-t r" onclick="delAgenda(${a.id})">🗑</button>
+        </div>
+      </div>`;
+    });
+  }
+
+  const mesPrev = new Date(yy,mm-2,1).toISOString().slice(0,7);
+  const mesNext = new Date(yy,mm,1).toISOString().slice(0,7);
+
+  document.getElementById('panel-agenda').innerHTML = `
+    <style>
+      .agenda-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+      .agenda-nav h2{font-size:16px;font-weight:700;color:var(--text)}
+      .agenda-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:3px;margin-bottom:16px}
+      .cal-head{text-align:center;font-size:10px;font-weight:700;color:var(--text3);padding:4px 0;font-family:var(--fm)}
+      .cal-cell{min-height:44px;border-radius:8px;border:1px solid var(--border);padding:4px;cursor:pointer;position:relative;background:var(--card);display:flex;flex-direction:column;align-items:center;gap:2px;transition:background 0.15s}
+      .cal-cell:hover{background:var(--bg2)}
+      .cal-cell.empty{border:none;background:transparent;cursor:default}
+      .cal-hoy{border:2px solid var(--g2)!important;background:var(--bg2)!important}
+      .cal-num{font-size:12px;font-family:var(--fm);font-weight:600;color:var(--text2)}
+      .cal-hoy .cal-num{color:var(--g2);font-weight:800}
+      .cal-dot{font-size:10px;font-weight:700;color:#fff;border-radius:10px;padding:1px 5px;font-family:var(--fm)}
+      .agenda-fecha-sep{font-size:11px;font-weight:700;color:var(--text3);padding:10px 0 4px;border-bottom:1px solid var(--border);margin-bottom:4px;font-family:var(--fm)}
+      .agenda-fecha-sep.pasado{color:var(--red)}
+      .agenda-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+      .agenda-item.vencido{background:#fff5f5;border-radius:6px;padding:10px 8px;margin-bottom:2px}
+      .ag-ico{font-size:20px;flex-shrink:0}
+      .ag-info{flex:1;min-width:0}
+      .ag-concepto{font-weight:600;font-size:13px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .ag-meta{font-size:11px;color:var(--text3);margin-top:2px}
+      .ag-monto{font-family:var(--fm);font-weight:700;font-size:13px;color:var(--g2);white-space:nowrap}
+      .ag-estado{flex-shrink:0}
+      .ag-acc{display:flex;gap:4px;flex-shrink:0}
+    </style>
+    <div class="mini-stats" style="margin-bottom:16px">
+      <div class="mini-stat"><div class="val" style="color:var(--amber)">Gs.${fmt(totalPend)}</div><div class="lbl">Pendiente</div></div>
+      <div class="mini-stat"><div class="val" style="color:var(--g2)">Gs.${fmt(totalPagado)}</div><div class="lbl">Pagado</div></div>
+      <div class="mini-stat"><div class="val" style="color:var(--amber)">${nPend}</div><div class="lbl">Pagos pendientes</div></div>
+      <div class="mini-stat"><div class="val" style="color:var(--red)">${nVenc}</div><div class="lbl">Vencidos</div></div>
+    </div>
+    <div class="card" style="padding:16px;margin-bottom:14px">
+      <div class="agenda-nav">
+        <button class="btn-t gr" onclick="navAgenda('${mesPrev}')">← Anterior</button>
+        <h2>📅 ${nomMeses[mm-1]} ${yy}</h2>
+        <button class="btn-t gr" onclick="navAgenda('${mesNext}')">Siguiente →</button>
+      </div>
+      ${calHtml}
+    </div>
+    <div class="card" style="padding:16px">
+      <div class="sec-hdr" style="margin-bottom:12px">
+        <div class="sec-title"><span class="dot"></span>Pagos de ${nomMeses[mm-1]}</div>
+        <button class="btn-t b" onclick="verTodosAgenda()">Ver todos</button>
+      </div>
+      <div id="agenda-lista">${listaHtml}</div>
+    </div>
+  `;
+}
+
+function navAgenda(mes) {
+  window._agendaMes = mes;
+  renderAgenda();
+}
+
+function filtrarAgendaDia(fecha) {
+  // Scrollear a esa fecha en la lista
+  const seps = document.querySelectorAll('.agenda-fecha-sep');
+  seps.forEach(s => {
+    if (s.textContent.includes(fmtD(fecha))) s.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+}
+
+function verTodosAgenda() {
+  window._agendaMes = null;
+  // Mostrar todos sin filtro de mes
+  const listData = [...(agenda||[])].sort((a,b)=>a.fecha.localeCompare(b.fecha));
+  const tipoIco = {cheque:'🧾',efectivo:'💵',transferencia:'🏦',cuota:'📅'};
+  const tipoLbl = {cheque:'Cheque',efectivo:'Efectivo',transferencia:'Transferencia',cuota:'Cuota'};
+  const hoy = today();
+  let listaHtml = '';
+  if (!listData.length) {
+    listaHtml = `<div class="empty" style="padding:24px"><div class="icon">📅</div>Sin pagos registrados</div>`;
+  } else {
+    let fechaActual = '';
+    listData.forEach(a => {
+      if (a.fecha !== fechaActual) {
+        fechaActual = a.fecha;
+        listaHtml += `<div class="agenda-fecha-sep${a.fecha<hoy?' pasado':''}">${fmtD(a.fecha)}</div>`;
+      }
+      const venc = a.estado==='pendiente'&&a.fecha<hoy;
+      listaHtml += `<div class="agenda-item${venc?' vencido':''}">
+        <div class="ag-ico">${tipoIco[a.tipo]||'💰'}</div>
+        <div class="ag-info">
+          <div class="ag-concepto">${he(a.concepto||'—')}</div>
+          <div class="ag-meta">${tipoLbl[a.tipo]||a.tipo}${a.nroCheque?' · N°'+he(a.nroCheque):''}${a.proveedor?' · '+he(a.proveedor):''}</div>
+        </div>
+        <div class="ag-monto">Gs. ${fmt(a.monto)}</div>
+        <div class="ag-estado">${a.estado==='pagado'?'<span class="badge green">Pagado</span>':`<button class="btn-t g" onclick="pagarAgenda(${a.id})" style="font-size:10px;padding:3px 8px">✓ Pagar</button>`}</div>
+        <div class="ag-acc">
+          <button class="btn-t gr" onclick="editAgenda(${a.id})">✏</button>
+          <button class="btn-t r" onclick="delAgenda(${a.id})">🗑</button>
+        </div>
+      </div>`;
+    });
+  }
+  document.getElementById('agenda-lista').innerHTML = listaHtml;
+}
+
+function openModalAgenda() {
+  document.getElementById('ag-id').value='';
+  document.getElementById('ag-fecha').value=today();
+  document.getElementById('ag-concepto').value='';
+  document.getElementById('ag-monto').value=0;
+  document.getElementById('ag-tipo').value='cheque';
+  document.getElementById('ag-nrocheque').value='';
+  document.getElementById('ag-proveedor').value='';
+  document.getElementById('ag-obs').value='';
+  agTipoChanged();
+  openModal('modal-agenda');
+}
+
+function agTipoChanged() {
+  const tipo = document.getElementById('ag-tipo').value;
+  document.getElementById('ag-cheque-wrap').style.display = tipo==='cheque'?'':'none';
+}
+
+function editAgenda(id) {
+  const a = agenda.find(x=>x.id===id); if(!a) return;
+  document.getElementById('ag-id').value=a.id;
+  document.getElementById('ag-fecha').value=a.fecha||today();
+  document.getElementById('ag-concepto').value=a.concepto||'';
+  document.getElementById('ag-monto').value=a.monto||0;
+  document.getElementById('ag-tipo').value=a.tipo||'cheque';
+  document.getElementById('ag-nrocheque').value=a.nroCheque||'';
+  document.getElementById('ag-proveedor').value=a.proveedor||'';
+  document.getElementById('ag-obs').value=a.obs||'';
+  agTipoChanged();
+  openModal('modal-agenda');
+}
+
+function saveAgenda() {
+  const concepto = document.getElementById('ag-concepto').value.trim();
+  if (!concepto) { toast('Ingresá el concepto','w'); return; }
+  const monto = parseFloat(document.getElementById('ag-monto').value)||0;
+  if (!monto) { toast('Ingresá el monto','w'); return; }
+  const fecha = document.getElementById('ag-fecha').value;
+  if (!fecha) { toast('Seleccioná la fecha','w'); return; }
+  const eid = document.getElementById('ag-id').value;
+  const obj = {
+    id: eid?parseInt(eid):Date.now(),
+    fecha,
+    concepto,
+    monto,
+    tipo: document.getElementById('ag-tipo').value||'cheque',
+    nroCheque: document.getElementById('ag-nrocheque').value.trim(),
+    proveedor: document.getElementById('ag-proveedor').value.trim(),
+    obs: document.getElementById('ag-obs').value.trim(),
+    estado: eid?(agenda.find(x=>x.id===parseInt(eid))||{}).estado||'pendiente':'pendiente',
+  };
+  if (eid) agenda=agenda.map(x=>x.id===parseInt(eid)?obj:x); else agenda.push(obj);
+  // Asegurar que el mes del calendario muestre el mes del pago recién guardado
+  window._agendaMes = fecha.slice(0,7);
+  saveAll(); closeModal('modal-agenda'); toast('Pago guardado ✓');
+  renderAgenda();
+}
+
+function pagarAgenda(id) {
+  const a = agenda.find(x=>x.id===id); if(!a) return;
+  if (!confirm(`¿Marcar como PAGADO?\n${a.concepto} — Gs.${fmt(a.monto)}`)) return;
+  a.estado='pagado'; saveAll(); toast('Pago registrado ✓'); renderAgenda();
+}
+
+function delAgenda(id) {
+  if (!confirm('¿Eliminar este pago de la agenda?')) return;
+  agenda=agenda.filter(x=>x.id!==id); saveAll(); toast('Eliminado'); renderAgenda();
+}
+
+
 function getERPData(){
-  return { presus, pedidos, facturas, clientes, productos, proveedores, gastos, counters };
+  return { presus, pedidos, facturas, clientes, productos, proveedores, gastos, counters, metaMensual, agenda };
 }
 function setERPData(data){
   if(!data) return;
@@ -1514,11 +1802,13 @@ function setERPData(data){
   productos   = data.productos   || [];
   proveedores = data.proveedores || [];
   gastos      = data.gastos      || [];
+  agenda      = data.agenda      || [];
   counters    = data.counters    || counters;
+  metaMensual = data.metaMensual || 400000000;
   saveAll();
   renderPanel(activePanel);
   updateSidebar();
-toast("Datos sincronizados con Railway ✓");
+  toast("Datos sincronizados con Railway ✓");
 }
 async function cargarDesdeNube(){
   const data = await loadCloud();
