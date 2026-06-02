@@ -911,20 +911,24 @@ function savePago() {
 // ═══════════════════════════════
 function renderGastos() {
   const filter=tabFilters.gastos||'todos';
-  let data=[...gastos].sort((a,b)=>b.id-a.id);
-  if (filter!=='todos') data=data.filter(g=>g.categoria===filter);
   const mes=mesActual();
-  const totMes=gastos.filter(g=>g.fecha&&g.fecha.startsWith(mes)).reduce((s,g)=>s+Number(g.monto||0),0);
-  const totPend=gastos.filter(g=>g.estado==='pendiente').reduce((s,g)=>s+Number(g.monto||0),0);
-  const totProv=gastos.filter(g=>g.categoria==='proveedor').reduce((s,g)=>s+Number(g.monto||0),0);
+  // Solo gastos pagados (vienen de Agenda)
+  let data=[...gastos].filter(g=>g.estado==='pagado').sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if (filter!=='todos') data=data.filter(g=>g.categoria===filter);
+  const totMes=gastos.filter(g=>g.estado==='pagado'&&g.fecha&&g.fecha.startsWith(mes)).reduce((s,g)=>s+Number(g.monto||0),0);
+  const totProv=gastos.filter(g=>g.estado==='pagado'&&g.categoria==='proveedor').reduce((s,g)=>s+Number(g.monto||0),0);
+  const totOp=gastos.filter(g=>g.estado==='pagado'&&g.categoria==='operativo').reduce((s,g)=>s+Number(g.monto||0),0);
   document.getElementById('gastos-mini-stats').innerHTML=`
-    <div class="mini-stat"><div class="val" style="color:var(--red)">Gs.${fmt(totMes)}</div><div class="lbl">Gastos del mes</div></div>
-    <div class="mini-stat"><div class="val" style="color:var(--amber)">Gs.${fmt(totPend)}</div><div class="lbl">Pendientes de pago</div></div>
-    <div class="mini-stat"><div class="val" style="color:var(--blue)">Gs.${fmt(totProv)}</div><div class="lbl">A proveedores (total)</div></div>
-    <div class="mini-stat"><div class="val">${gastos.length}</div><div class="lbl">Registros</div></div>
+    <div class="mini-stat"><div class="val" style="color:var(--red)">Gs.${fmt(totMes)}</div><div class="lbl">Pagado este mes</div></div>
+    <div class="mini-stat"><div class="val" style="color:var(--blue)">Gs.${fmt(totProv)}</div><div class="lbl">A proveedores</div></div>
+    <div class="mini-stat"><div class="val" style="color:var(--amber)">Gs.${fmt(totOp)}</div><div class="lbl">Operativos</div></div>
+    <div class="mini-stat"><div class="val">${gastos.filter(g=>g.estado==='pagado').length}</div><div class="lbl">Total registros</div></div>
   `;
   const tb=document.getElementById('tabla-gastos');
-  if (!data.length) { tb.innerHTML=`<tr><td colspan="8"><div class="empty"><div class="icon">💸</div>Sin gastos registrados</div></td></tr>`; return; }
+  if (!data.length) {
+    tb.innerHTML=`<tr><td colspan="7"><div class="empty"><div class="icon">💸</div>Sin gastos pagados aún — los pagos de la Agenda aparecen aquí automáticamente</div></td></tr>`;
+    return;
+  }
   const catLabel={proveedor:'Proveedor',operativo:'Operativo',otro:'Otro'};
   const catColor={proveedor:'blue',operativo:'amber',otro:'gray'};
   tb.innerHTML=data.map(g=>`<tr>
@@ -932,13 +936,9 @@ function renderGastos() {
     <td style="font-size:12px;color:var(--text3)">${fmtD(g.fecha)}</td>
     <td><span class="badge ${catColor[g.categoria]||'gray'}">${catLabel[g.categoria]||g.categoria}</span></td>
     <td style="font-weight:600;color:var(--text)">${he(g.concepto||'—')}</td>
-    <td style="font-size:12px;color:var(--text2)">${he(g.proveedorId?nomProv(g.proveedorId):g.proveedorNombre||'—')}</td>
+    <td style="font-size:12px;color:var(--text2)">${he(g.proveedorNombre||nomProv(g.proveedorId)||'—')}</td>
     <td class="r" style="font-family:var(--fm);font-weight:700;color:var(--red)">Gs.${fmt(g.monto)}</td>
-    <td>${badgeGasto(g.estado)}</td>
-    <td><div class="act-group">
-      <button class="btn-t gr" onclick="editGasto(${g.id})">✏</button>
-      <button class="btn-t r" onclick="delGasto(${g.id})">🗑</button>
-    </div></td>
+    <td><span class="badge green">Pagado</span></td>
   </tr>`).join('');
 }
 function openModalGasto() {
@@ -1781,7 +1781,28 @@ function saveAgenda() {
 function pagarAgenda(id) {
   const a = agenda.find(x=>x.id===id); if(!a) return;
   if (!confirm(`¿Marcar como PAGADO?\n${a.concepto} — Gs.${fmt(a.monto)}`)) return;
-  a.estado='pagado'; saveAll(); toast('Pago registrado ✓'); renderAgenda();
+  a.estado='pagado';
+  // Crear registro automático en Gastos
+  const tipoACat = {cheque:'proveedor', efectivo:'operativo', transferencia:'proveedor', cuota:'otro'};
+  const gasto = {
+    id: Date.now(),
+    num: nextNum('gasto','GST-',5),
+    fecha: a.fecha,
+    categoria: tipoACat[a.tipo]||'otro',
+    concepto: a.concepto + (a.nroCheque?' — Cheque N°'+a.nroCheque:''),
+    proveedorId: null,
+    proveedorNombre: a.proveedor||'',
+    monto: a.monto,
+    nrofac: a.nroCheque||'',
+    obs: 'Generado desde Agenda de Pagos' + (a.obs?'\n'+a.obs:''),
+    estado: 'pagado',
+    agendaId: a.id,
+  };
+  gastos.unshift(gasto);
+  saveAll();
+  toast('Pago registrado y agregado a Gastos ✓');
+  renderAgenda();
+  updateSidebar();
 }
 
 function delAgenda(id) {
