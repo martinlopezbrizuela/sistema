@@ -3,74 +3,184 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KAVAJU28 Login</title>
+<title>KAVAJU — Sistema de Gestión</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-body{min-height:100vh;display:flex;justify-content:center;align-items:center;background:#e7e4dc;font-family:"Courier New",monospace}
-.monitor{width:850px;max-width:95%;padding:24px;background:#b9b6ae;border-radius:28px;border:4px solid #7d7a74;box-shadow:inset 0 0 15px rgba(255,255,255,.7),0 20px 50px rgba(0,0,0,.35)}
-.frame{background:#111;padding:28px;border-radius:26px}
-.screen{position:relative;min-height:650px;padding:40px;border-radius:24px;background:#f7f7f2;border:4px solid #111;color:#111;overflow:hidden;box-shadow:inset 0 0 45px rgba(0,0,0,.18)}
-.screen::before{content:"";position:absolute;inset:0;background:repeating-linear-gradient(to bottom,rgba(0,0,0,.035),rgba(0,0,0,.035) 1px,transparent 1px,transparent 4px);pointer-events:none}
-.content{position:relative;z-index:2}
-.topbar{display:flex;justify-content:space-between;font-size:17px;font-weight:bold}
-.separator{margin:18px 0 40px;border-top:3px dashed #111}
-.title{text-align:center;font-size:90px;font-weight:900;letter-spacing:5px;margin-bottom:18px}
-.subtitle{text-align:center;font-size:24px;font-weight:bold;margin-bottom:40px}
-.box{width:80%;margin:auto;padding:35px;border:4px solid #111;text-align:center}
-.box p{font-size:24px;margin-bottom:8px;font-weight:bold}
-.small-separator{border-top:3px dashed #111;margin:30px 0}
-label{display:block;font-size:22px;font-weight:bold;margin-bottom:20px}
-input{width:320px;max-width:100%;padding:18px;border:4px solid #111;background:#f7f7f2;color:#111;text-align:center;font-size:34px;letter-spacing:18px;font-family:"Courier New",monospace;outline:none}
-button{display:block;margin:30px auto 0;padding:15px 50px;border:4px solid #111;background:#f7f7f2;color:#111;font-size:22px;font-weight:bold;font-family:"Courier New",monospace;cursor:pointer}
-button:hover{background:#111;color:#f7f7f2}
-#msg{margin-top:25px;font-size:22px;font-weight:bold}
-.footer{margin-top:40px;display:flex;justify-content:space-between;font-size:17px;font-weight:bold}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .card {
+    width: 100%;
+    max-width: 440px;
+    background: white;
+    padding: 38px;
+    border-radius: 18px;
+    box-shadow: 0 20px 45px rgba(0,0,0,.12);
+    text-align: center;
+  }
+  .logo-agro {
+    font-size: 22px;
+    letter-spacing: 8px;
+    font-weight: 500;
+    color: #1f2937;
+    margin-bottom: -4px;
+  }
+  .logo-kavaju {
+    font-size: 64px;
+    font-weight: 900;
+    color: #9b6238;
+    letter-spacing: 2px;
+    line-height: 1;
+  }
+  .subtitle {
+    color: #006b33;
+    font-weight: 600;
+    margin: 18px 0 28px;
+  }
+  label {
+    display: block;
+    text-align: left;
+    font-weight: 700;
+    color: #006b33;
+    margin: 16px 0 8px;
+  }
+  input {
+    width: 100%;
+    height: 50px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    padding: 0 14px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus { border-color: #006b33; }
+  .pin-row {
+    display: flex;
+    gap: 8px;
+  }
+  .pin-row input { flex: 1; }
+  .pin-row button {
+    width: 52px;
+    border: 1px solid #d1d5db;
+    border-radius: 9px;
+    background: white;
+    cursor: pointer;
+    font-size: 18px;
+    transition: background 0.15s;
+  }
+  .pin-row button:hover { background: #f3f4f6; }
+  .btn {
+    width: 100%;
+    height: 54px;
+    margin-top: 28px;
+    border: none;
+    border-radius: 9px;
+    background: #006b33;
+    color: white;
+    font-size: 16px;
+    font-weight: 800;
+    cursor: pointer;
+    letter-spacing: 1px;
+    transition: background 0.2s, transform 0.1s;
+  }
+  .btn:hover { background: #005528; }
+  .btn:active { transform: scale(0.98); }
+  .modules {
+    margin-top: 26px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 13px;
+    color: #6b7280;
+  }
+  .modules span {
+    background: #f9fafb;
+    border: 1px solid #e5e7eb;
+    border-radius: 6px;
+    padding: 4px 10px;
+  }
+  #msg {
+    font-weight: 700;
+    margin-top: 18px;
+    min-height: 24px;
+    font-size: 14px;
+  }
+  @media (max-width: 480px) {
+    .card {
+      margin: 18px;
+      padding: 28px 22px;
+    }
+    .logo-agro {
+      font-size: 17px;
+      letter-spacing: 5px;
+    }
+    .logo-kavaju {
+      font-size: 48px;
+    }
+    .modules {
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+  }
 </style>
 </head>
 <body>
-<div class="monitor">
-  <div class="frame">
-    <div class="screen">
-      <div class="content">
-        <div class="topbar">
-          <span>KAVAJU28 SYSTEMS v1.0</span>
-          <span>© 2026 KAVAJU INDUSTRIES</span>
-        </div>
-        <div class="separator"></div>
-        <div class="title">KAVAJU28</div>
-        <div class="subtitle">— USUARIO > DRACULA —</div>
-        <div class="box">
-          <p>ACCESO RESTRINGIDO</p>
-          <p>SOLO PERSONAL AUTORIZADO</p>
-          <div class="small-separator"></div>
-          <label>INGRESE SU PIN</label>
-          <input type="password" id="pin" maxlength="4" autofocus>
-          <button onclick="login()">[ ENTRAR ]</button>
-          <div id="msg"></div>
-        </div>
-        <div class="footer">
-          <span>F1: AYUDA</span>
-          <span>F2: RECUPERAR</span>
-          <span>F10: SALIR</span>
-        </div>
-      </div>
-    </div>
+<div class="card">
+  <div class="logo-agro">AGROPECUARIA</div>
+  <div class="logo-kavaju">KAVAJU</div>
+  <div class="subtitle">Sistema de Gestión</div>
+
+  <label>Usuario</label>
+  <input id="usuario" type="text" value="KAVAJU" autocomplete="username" onkeydown="if(event.key==='Enter')document.getElementById('pin').focus()">
+
+  <label>PIN</label>
+  <div class="pin-row">
+    <input id="pin" type="password" placeholder="••••" autocomplete="current-password" onkeydown="if(event.key==='Enter')login()">
+    <button onclick="togglePin()" title="Mostrar/ocultar PIN">👁</button>
   </div>
+
+  <button class="btn" onclick="login()">INGRESAR AL SISTEMA</button>
+
+  <div class="modules">
+    <span>Ventas</span>
+    <span>Stock</span>
+    <span>Facturación</span>
+    <span>Cobranzas</span>
+  </div>
+
+  <p id="msg"></p>
 </div>
+
 <script>
-function login(){
-  const pin = document.getElementById("pin").value;
-  const msg = document.getElementById("msg");
-  if(pin === "3335"){
-    msg.innerHTML = "ABRAZO FRANJEADO";
-    setTimeout(function(){ window.location.href = "/sistema.html"; }, 1000);
+function togglePin() {
+  const pin = document.getElementById('pin');
+  pin.type = pin.type === 'password' ? 'text' : 'password';
+}
+
+function login() {
+  const usuario = document.getElementById('usuario').value.trim().toUpperCase();
+  const pin = document.getElementById('pin').value.trim();
+  const msg = document.getElementById('msg');
+
+  if (usuario === 'KAVAJU' && pin === '3335') {
+    msg.style.color = '#006b33';
+    msg.textContent = '✓ ACCESO CONCEDIDO';
+    setTimeout(function() {
+      window.location.href = 'sistema.html';
+    }, 600);
   } else {
-    msg.innerHTML = "PIN INCORRECTO";
+    msg.style.color = '#dc2626';
+    msg.textContent = '✕ Usuario o PIN incorrecto';
+    document.getElementById('pin').value = '';
+    document.getElementById('pin').focus();
   }
 }
-document.getElementById("pin").addEventListener("keydown", function(e){
-  if(e.key === "Enter") login();
-});
 </script>
 </body>
 </html>
