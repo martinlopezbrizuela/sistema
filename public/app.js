@@ -345,7 +345,7 @@ function renderPieCategorias(containerId) {
   var cats = Object.keys(catMap);
   if (!cats.length) { el.innerHTML = '<p style="color:var(--text3);text-align:center;padding:24px;font-size:13px">Sin ventas por categor\u00eda</p>'; return; }
   var total = cats.reduce(function(s,c){ return s+catMap[c]; }, 0);
-  var COLORS = ['#c8a84b','#27ae60','#1565c0','#e74c3c','#6a1b9a','#00838f','#e65100','#4e342e'];
+  var COLORS = ['#29b6d4','#27ae60','#e74c3c','#6a1b9a','#00838f','#e65100','#4e342e','#f39c12'];
   var startAngle = -Math.PI/2, size=160, cx=80, cy=80, r=62, slices='';
   cats.forEach(function(cat,i) {
     var pct=catMap[cat]/total, angle=pct*2*Math.PI;
@@ -372,17 +372,38 @@ function renderMetaMensual(containerId, ventasMes) {
   var el = document.getElementById(containerId);
   if (!el) return;
   var META=400000000, pctNum=(ventasMes/META)*100, pctBar=Math.min(pctNum,100);
-  var metaOk=ventasMes>=META, horseLeft=Math.min(pctBar,94);
+  var metaOk=ventasMes>=META;
+  // Posición caballo: entre 2% y 88% para que no tape START ni trofeo
+  var horseLeft=2 + (Math.min(pctBar,100)/100)*86;
   var horseChar=metaOk?'\u{1F3C6}':'\u{1F40E}';
+
   el.innerHTML=
-    '<div style="position:relative;background:var(--bg2);border-radius:30px;height:44px;overflow:visible;border:2px solid var(--g2);margin:10px 0 6px">'+
-    '<div style="height:100%;border-radius:28px;background:linear-gradient(90deg,var(--g2),#a67c2e);width:'+pctBar+'%;transition:width 0.7s ease"></div>'+
-    '<span style="position:absolute;top:50%;left:'+horseLeft+'%;transform:translate(-50%,-50%);font-size:26px;line-height:1;pointer-events:none;filter:drop-shadow(0 1px 2px rgba(0,0,0,.2))">'+horseChar+'</span>'+
-    '</div>'+
-    '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:0 2px">'+
-    '<span style="color:var(--text2);font-family:var(--fm)">Gs. '+fmt(ventasMes)+' / Gs. '+fmt(META)+'</span>'+
-    '<span style="font-weight:700;font-family:var(--fm);font-size:13px;color:'+(metaOk?'var(--g2)':'var(--amber)')+'">'+
-    (metaOk?'\u2713 Meta alcanzada!':('Avance: '+pctNum.toFixed(1)+'%'))+'</span></div>';
+    // Pista con START y TROFEO
+    '<div style="display:flex;align-items:center;gap:6px;margin:10px 0 0">' +
+      // START
+      '<div style="font-size:10px;font-weight:900;color:#fff;background:#e74c3c;border-radius:6px;padding:3px 6px;flex-shrink:0;letter-spacing:1px">START</div>' +
+      // Barra carrera
+      '<div style="flex:1;position:relative;height:48px">' +
+        // Fondo pista
+        '<div style="position:absolute;inset:0;border-radius:24px;background:linear-gradient(180deg,#87ceeb 0%,#87ceeb 55%,#4a7c3f 55%,#2d5a1b 100%);border:2px solid #5a8a4a;overflow:hidden">' +
+          // Líneas de pista
+          '<div style="position:absolute;top:0;left:0;right:0;bottom:45%;background:repeating-linear-gradient(90deg,transparent,transparent 18px,rgba(255,255,255,0.15) 18px,rgba(255,255,255,0.15) 20px)"></div>' +
+          // Pasto textura
+          '<div style="position:absolute;bottom:0;left:0;right:0;top:55%;background:repeating-linear-gradient(90deg,#2d5a1b,#2d5a1b 8px,#4a7c3f 8px,#4a7c3f 16px)"></div>' +
+        '</div>' +
+        // Barra progreso
+        '<div style="position:absolute;top:4px;left:4px;bottom:4px;border-radius:20px;background:linear-gradient(90deg,rgba(255,255,255,0.3),rgba(255,255,255,0.1));width:'+pctBar+'%;transition:width 0.8s ease;max-width:calc(100% - 8px)"></div>' +
+        // Caballo — espejado con scaleX(-1)
+        '<span style="position:absolute;top:50%;left:'+horseLeft+'%;transform:translate(-50%,-50%) scaleX(-1);font-size:28px;line-height:1;pointer-events:none;filter:drop-shadow(0 1px 3px rgba(0,0,0,.3))">' + horseChar + '</span>' +
+      '</div>' +
+      // TROFEO al final
+      '<div style="font-size:26px;flex-shrink:0;filter:drop-shadow(0 1px 2px rgba(0,0,0,.2))">\u{1F3C6}</div>' +
+    '</div>' +
+    // Texto debajo
+    '<div style="display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:4px 2px 0">' +
+    '<span style="color:var(--text2);font-family:var(--fm)">Gs. '+fmt(ventasMes)+' / Gs. '+fmt(META)+'</span>' +
+    '<span style="font-weight:700;font-family:var(--fm);font-size:13px;color:'+(metaOk?'var(--g2)':'var(--amber)')+'">' +
+    (metaOk?'\u2713 \u00a1Meta alcanzada!':('Avance: '+pctNum.toFixed(1)+'%'))+'</span></div>';
 }
 
 // ═══════════════════════════════
