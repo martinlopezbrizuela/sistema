@@ -141,7 +141,7 @@ function fillProdSel(selId, val) {
 // ── NAVIGATION ──
 const panelTitles = {
   dashboard:'Dashboard / Inicio', presupuestos:'Presupuestos / Cotizaciones',
-  pedidos:'Pedidos / Gestión', facturas:'Facturación',
+  facturas:'Facturación',
   cobrar:'Cuentas a Cobrar', gastos:'Gastos / Egresos',
   stock:'Stock / Inventario', clientes:'Clientes',
   productos:'Productos', proveedores:'Proveedores',
@@ -150,10 +150,9 @@ const panelTitles = {
 const topbarMap = {
   dashboard:    { lbl:'＋ Presupuesto',    fn:'openModalPresupuesto' },
   presupuestos: { lbl:'＋ Nuevo Presupuesto', fn:'openModalPresupuesto' },
-  pedidos:      { lbl:'＋ Nuevo Pedido',    fn:'openModalPedido' },
   facturas:     { lbl:'＋ Nueva Factura',   fn:'openModalFactura' },
   cobrar:       { lbl:'', fn:'' },
-  gastos:       { lbl:'＋ Registrar Gasto', fn:'openModalGasto' },
+  gastos:       { lbl:'', fn:'' },
   stock:        { lbl:'＋ Nuevo Producto',  fn:'openModalProducto' },
   clientes:     { lbl:'＋ Nuevo Cliente',   fn:'openModalCliente' },
   productos:    { lbl:'＋ Nuevo Producto',  fn:'openModalProducto' },
@@ -183,7 +182,6 @@ function renderPanel(id) {
   switch(id) {
     case 'dashboard':    renderDashboard();    break;
     case 'presupuestos': renderPresupuestos(); break;
-    case 'pedidos':      renderPedidos();      break;
     case 'facturas':     renderFacturas();     break;
     case 'cobrar':       renderCobrar();       break;
     case 'gastos':       renderGastos();       break;
@@ -207,9 +205,6 @@ function updateSidebar() {
   const pp = presus.filter(p=>p.estado==='pendiente').length;
   const spp = document.getElementById('sbb-presu');
   spp.textContent=pp; spp.style.display=pp?'':'none';
-  const pedp = pedidos.filter(p=>p.estado==='pendiente').length;
-  const spd = document.getElementById('sbb-ped');
-  spd.textContent=pedp; spd.style.display=pedp?'':'none';
   const cv = facturas.filter(f=>f.condicion==='credito'&&f.estado!=='pagada'&&diasMora(f.fechaVenc)>0).length;
   const sc = document.getElementById('sbb-cobrar');
   sc.textContent=cv; sc.style.display=cv?'':'none';
@@ -233,7 +228,6 @@ function renderDashboard() {
   const ventasMes = facsMes.reduce((s,f)=>s+Number(f.total||0), 0);
   const gastosMes = gastos.filter(g=>g.fecha&&g.fecha.startsWith(mes)).reduce((s,g)=>s+Number(g.monto||0), 0);
   const totalDeuda = facturas.filter(f=>f.condicion==='credito'&&f.estado!=='pagada').reduce((s,f)=>s+Number(f.saldo||0), 0);
-  const pedPend = pedidos.filter(p=>p.estado==='pendiente').length;
   const presuPend = presus.filter(p=>p.estado==='pendiente').length;
   const facVenc = facturas.filter(f=>f.condicion==='credito'&&f.estado!=='pagada'&&diasMora(f.fechaVenc)>0).length;
   const bajoStock = productos.filter(p=>stockTotal(p)<=p.stockMin).length;
@@ -242,7 +236,7 @@ function renderDashboard() {
     <div class="kpi-card green"><div class="kpi-label">Ventas del Mes</div><div class="kpi-val green">Gs. ${fmt(ventasMes)}</div><div class="kpi-sub">${facsMes.length} factura(s) — ${mes}</div><div class="kpi-ico">💵</div></div>
     <div class="kpi-card red"><div class="kpi-label">Cuentas a Cobrar</div><div class="kpi-val red">Gs. ${fmt(totalDeuda)}</div><div class="kpi-sub">Créditos pendientes</div><div class="kpi-ico">💳</div></div>
     <div class="kpi-card amber"><div class="kpi-label">Gastos del Mes</div><div class="kpi-val amber">Gs. ${fmt(gastosMes)}</div><div class="kpi-sub">Pagos y costos operativos</div><div class="kpi-ico">💸</div></div>
-    <div class="kpi-card blue"><div class="kpi-label">Pedidos Pendientes</div><div class="kpi-val blue">${pedPend}</div><div class="kpi-sub">${presuPend} presupuesto(s) pend.</div><div class="kpi-ico">📦</div></div>
+    <div class="kpi-card blue"><div class="kpi-label">Presupuestos</div><div class="kpi-val blue">${presuPend}</div><div class="kpi-sub">Esperando respuesta</div><div class="kpi-ico">📋</div></div>
     <div class="kpi-card red"><div class="kpi-label">Facturas Vencidas</div><div class="kpi-val red">${facVenc}</div><div class="kpi-sub">Con saldo pendiente</div><div class="kpi-ico">⚠️</div></div>
     <div class="kpi-card amber"><div class="kpi-label">Bajo Stock</div><div class="kpi-val amber">${bajoStock}</div><div class="kpi-sub">Productos a reponer</div><div class="kpi-ico">📉</div></div>
   `;
@@ -284,14 +278,47 @@ function renderDashboard() {
   const totalPie = Math.max(alDia+conDeuda+vencidos, 1);
   const pAl=Math.round(alDia/totalPie*100), pDeu=Math.round(conDeuda/totalPie*100), pVen=100-pAl-pDeu;
   document.getElementById('dash-pie').innerHTML = `
-    <svg class="pie-svg" width="100" height="100" viewBox="0 0 36 36">
-      ${pieSlice(pAl,0,'#27ae60')}${pieSlice(pDeu,pAl,'#e67e22')}${pieSlice(pVen,pAl+pDeu,'#e74c3c')}
-      <circle cx="18" cy="18" r="10" fill="var(--card)"/>
-    </svg>
-    <div class="pie-legend">
-      <div class="pie-leg-item"><div class="pie-dot" style="background:#27ae60"></div>Al día — ${alDia} (${pAl}%)</div>
-      <div class="pie-leg-item"><div class="pie-dot" style="background:var(--amber)"></div>Con deuda — ${conDeuda} (${pDeu}%)</div>
-      <div class="pie-leg-item"><div class="pie-dot" style="background:var(--red)"></div>Vencidos — ${vencidos} (${pVen}%)</div>
+    <div style="display:flex;flex-direction:column;gap:14px;padding:4px 0">
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#27ae60"></span>
+            <span style="font-size:13px;color:var(--text2);font-weight:600">Al día</span>
+          </div>
+          <span style="font-family:var(--fm);font-size:13px;font-weight:700;color:#27ae60">${alDia} clientes (${pAl}%)</span>
+        </div>
+        <div style="height:10px;background:var(--bg2);border-radius:6px;overflow:hidden">
+          <div style="height:100%;width:${pAl}%;background:#27ae60;border-radius:6px;transition:width 0.6s ease"></div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#e67e22"></span>
+            <span style="font-size:13px;color:var(--text2);font-weight:600">Con deuda</span>
+          </div>
+          <span style="font-family:var(--fm);font-size:13px;font-weight:700;color:#e67e22">${conDeuda} clientes (${pDeu}%)</span>
+        </div>
+        <div style="height:10px;background:var(--bg2);border-radius:6px;overflow:hidden">
+          <div style="height:100%;width:${pDeu}%;background:#e67e22;border-radius:6px;transition:width 0.6s ease"></div>
+        </div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:#e74c3c"></span>
+            <span style="font-size:13px;color:var(--text2);font-weight:600">Vencidos</span>
+          </div>
+          <span style="font-family:var(--fm);font-size:13px;font-weight:700;color:#e74c3c">${vencidos} clientes (${pVen}%)</span>
+        </div>
+        <div style="height:10px;background:var(--bg2);border-radius:6px;overflow:hidden">
+          <div style="height:100%;width:${pVen}%;background:#e74c3c;border-radius:6px;transition:width 0.6s ease"></div>
+        </div>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;justify-content:space-between;font-size:11px;color:var(--text3);font-family:var(--fm)">
+        <span>Total clientes: <strong>${totalPie}</strong></span>
+        <span onclick="goPanel('cobrar')" style="color:var(--g2);cursor:pointer;font-weight:600">Ver cobranzas →</span>
+      </div>
     </div>`;
 
   const bajo = productos.filter(p=>stockTotal(p)<=p.stockMin).sort((a,b)=>stockTotal(a)-stockTotal(b)).slice(0,6);
