@@ -262,14 +262,15 @@ function renderDashboard() {
   }
 
   const meses6=[]; const now=new Date();
-  for(let i=5;i>=0;i--){
-    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
+  for(let i=0;i<=5;i++){
+    const d=new Date(now.getFullYear(),now.getMonth()-5+i,1);
     const key=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
     meses6.push({key,lbl:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()]});
   }
   const vals = meses6.map(m=>facturas.filter(f=>f.fecha&&f.fecha.startsWith(m.key)).reduce((s,f)=>s+Number(f.total||0),0));
   const maxV = Math.max(...vals, 1);
   const barColors = ['#5b9bd5','#70ad47','#ed7d31','#a084c8','#4bacc6','#c8a84b'];
+  // Junio = índice 5 = última barra a la derecha
   document.getElementById('dash-chart').innerHTML = vals.map((v,i) => {
     const h = Math.max(Math.round(v/maxV*82), 4);
     const color = barColors[i];
