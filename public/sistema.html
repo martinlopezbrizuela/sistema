@@ -28,7 +28,6 @@
       <div class="sb-item active" onclick="goPanel('dashboard')"><span class="ico">⬡</span><span>Dashboard</span></div>
       <div class="sb-group">Ventas</div>
       <div class="sb-item" id="sb-presupuestos" onclick="goPanel('presupuestos')"><span class="ico">📋</span><span>Presupuestos</span><span class="sbadge amber" id="sbb-presu" style="display:none">0</span></div>
-      <div class="sb-item" id="sb-pedidos" onclick="goPanel('pedidos')"><span class="ico">📦</span><span>Pedidos</span><span class="sbadge amber" id="sbb-ped" style="display:none">0</span></div>
       <div class="sb-item" id="sb-facturas" onclick="goPanel('facturas')"><span class="ico">🧾</span><span>Facturación</span></div>
       <div class="sb-group">Finanzas</div>
       <div class="sb-item" id="sb-cobrar" onclick="goPanel('cobrar')"><span class="ico">💰</span><span>Cuentas a Cobrar</span><span class="sbadge red" id="sbb-cobrar" style="display:none">0</span></div>
@@ -120,20 +119,6 @@
         <div class="tbl-wrap"><div class="tbl-inner"><table>
           <thead><tr><th>N°</th><th>Fecha</th><th>Cliente</th><th>Productos</th><th class="r">Exento</th><th class="r">IVA 10</th><th class="r">Total</th><th>Estado</th><th>Acciones</th></tr></thead>
           <tbody id="tabla-presupuestos"></tbody>
-        </table></div></div>
-      </div>
-      <!-- PEDIDOS -->
-      <div class="panel" id="panel-pedidos">
-        <div class="tabs">
-          <button class="tab active" onclick="switchTab('pedidos','todos',this)">Todos</button>
-          <button class="tab" onclick="switchTab('pedidos','pendiente',this)">Pendientes</button>
-          <button class="tab" onclick="switchTab('pedidos','entregado',this)">Entregados</button>
-          <button class="tab" onclick="switchTab('pedidos','cancelado',this)">Cancelados</button>
-        </div>
-        <div class="mini-stats" id="pedidos-mini-stats"></div>
-        <div class="tbl-wrap"><div class="tbl-inner"><table>
-          <thead><tr><th>N° Pedido</th><th>Fecha</th><th>Cliente</th><th>Detalle</th><th class="r">Cant.</th><th class="r">Monto</th><th>Estado</th><th>Acciones</th></tr></thead>
-          <tbody id="tabla-pedidos"></tbody>
         </table></div></div>
       </div>
       <!-- FACTURAS -->
