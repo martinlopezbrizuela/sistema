@@ -265,11 +265,22 @@ function renderDashboard() {
   for(let i=5;i>=0;i--){const d=new Date(now.getFullYear(),now.getMonth()-i,1);meses6.push({key:d.toISOString().slice(0,7),lbl:['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'][d.getMonth()]});}
   const vals = meses6.map(m=>facturas.filter(f=>f.fecha&&f.fecha.startsWith(m.key)).reduce((s,f)=>s+Number(f.total||0),0));
   const maxV = Math.max(...vals, 1);
-  document.getElementById('dash-chart').innerHTML = vals.map((v,i) => {
-    const h = Math.max(Math.round(v/maxV*82), 4);
-    return `<div class="bar-col"><div class="bar${i===vals.length-1?' active-bar':''}" style="height:${h}px"><span class="bval">Gs.${fmt(v)}</span></div></div>`;
-  }).join('');
-  document.getElementById('dash-chart-labels').innerHTML = meses6.map(m=>`<div style="flex:1;text-align:center;font-family:var(--fm);font-size:9px;color:var(--text3)">${m.lbl}</div>`).join('');
+  const barColors = ['#5b9bd5','#70ad47','#ed7d31','#a084c8','#4bacc6','#c8a84b'];
+  document.getElementById('dash-chart').innerHTML = `
+    <div style="display:flex;align-items:flex-end;gap:6px;height:100px;padding:0 4px">
+      ${vals.map((v,i) => {
+        const h = Math.max(Math.round(v/maxV*88), v>0?6:2);
+        const color = barColors[i];
+        const isLast = i===vals.length-1;
+        return `<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:3px">
+          <span style="font-size:9px;font-family:var(--fm);color:${color};font-weight:700;white-space:nowrap">${v>0?'Gs.'+fmt(v):''}</span>
+          <div style="width:100%;height:${h}px;background:${color};border-radius:4px 4px 0 0;opacity:${isLast?1:0.75};transition:height 0.4s ease;position:relative">
+            ${isLast?`<div style="position:absolute;inset:0;border-radius:4px 4px 0 0;background:rgba(255,255,255,0.15)"></div>`:''}
+          </div>
+        </div>`;
+      }).join('')}
+    </div>`;
+  document.getElementById('dash-chart-labels').innerHTML = meses6.map((m,i)=>`<div style="flex:1;text-align:center;font-family:var(--fm);font-size:10px;font-weight:${i===meses6.length-1?'700':'500'};color:${i===meses6.length-1?barColors[i]:'var(--text3)'}">${m.lbl}</div>`).join('');
 
   const cliIds = new Set(facturas.map(f=>f.clienteId));
   const alDia    = Array.from(cliIds).filter(id=>{const fs=facturas.filter(f=>f.clienteId===id&&f.condicion==='credito');return fs.length===0||fs.every(f=>f.estado==='pagada'||diasMora(f.fechaVenc)===0);}).length||0;
