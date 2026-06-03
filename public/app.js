@@ -1325,14 +1325,14 @@ function buildPresupuestoHTML(p) {
     *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}
     body{background:#f5f5f5;color:#222;font-size:13px}
     .wrap{max-width:820px;margin:20px auto;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.08)}
-    .hdr{padding:18px 24px;border-bottom:3px solid #7B4A2D;display:flex;justify-content:space-between;align-items:flex-start}
+    .hdr{padding:18px 24px;border-bottom:3px solid #0D6B37;display:flex;justify-content:space-between;align-items:flex-start}
     .hl{display:flex;align-items:center;gap:14px}
     .logo{width:90px;height:90px;object-fit:contain;flex-shrink:0}
     .emp h1{font-size:16px;font-weight:800;color:#333;margin-bottom:4px}
     .emp p{font-size:11px;color:#666;line-height:1.7}
     .hr2{text-align:right}
     .dt{font-size:10px;font-weight:700;letter-spacing:2px;color:#999;text-transform:uppercase;margin-bottom:6px}
-    .dn{font-size:22px;font-weight:800;color:#7B4A2D;margin-bottom:6px}
+    .dn{font-size:22px;font-weight:800;color:#0D6B37;margin-bottom:6px}
     .df{font-size:13px;font-weight:600;color:#222;margin-bottom:6px}
     .ch{display:inline-block;padding:3px 12px;border-radius:12px;font-size:10px;font-weight:700;text-transform:uppercase}
     .cp{background:#fff3cd;color:#856404;border:1px solid #ffc107}
@@ -1341,18 +1341,18 @@ function buildPresupuestoHTML(p) {
     .ic{padding:14px 24px}.ic:first-child{border-right:1px solid #eee}
     .ir{display:flex;gap:8px;margin-bottom:6px;font-size:12px}
     .il{font-weight:700;color:#555;min-width:90px;flex-shrink:0}
-    .iv{color:#222}.hi{color:#7B4A2D;font-weight:600}
+    .iv{color:#222}.hi{color:#0D6B37;font-weight:600}
     .tw{padding:14px 24px}
     .tbl{width:100%;border-collapse:collapse;font-size:12px}
-    .tbl th{background:#7B4A2D;color:#fff;padding:9px 10px;text-align:left;font-size:11px;font-weight:700}
+    .tbl th{background:#0D6B37;color:#fff;padding:9px 10px;text-align:left;font-size:11px;font-weight:700}
     .tbl th.r,.tbl td.r{text-align:right}
     .tbl td{padding:8px 10px;border-bottom:1px solid #f0f0f0}
-    .tbl tbody tr:nth-child(even) td{background:#faf7f5}
-    .tbl tfoot td{background:#f5f0ed;font-weight:700;border-top:2px solid #7B4A2D;padding:9px 10px}
+    .tbl tbody tr:nth-child(even) td{background:#f0f9f3}
+    .tbl tfoot td{background:#eef7f1;font-weight:700;border-top:2px solid #0D6B37;padding:9px 10px}
     .tots{padding:0 24px 18px;display:flex;justify-content:flex-end}
     .tb{border:1px solid #ddd;border-radius:8px;overflow:hidden;min-width:290px}
     .tr2{display:flex;justify-content:space-between;padding:8px 14px;font-size:12px;border-bottom:1px solid #f0f0f0}
-    .tr2:last-child{background:#7B4A2D;color:#fff;font-size:14px;font-weight:800;border-bottom:none}
+    .tr2:last-child{background:#0D6B37;color:#fff;font-size:14px;font-weight:800;border-bottom:none}
     .foot{background:#f5f5f5;border-top:1px solid #e0e0e0;padding:10px 24px;font-size:10px;color:#999;text-align:center}
   </style>
   <div class="wrap">
@@ -1408,31 +1408,31 @@ function buildFacturaHTML(f) {
     *{box-sizing:border-box;margin:0;padding:0;font-family:'Segoe UI',Arial,sans-serif}
     body{background:#f5f5f5;color:#222;font-size:13px}
     .wrap{max-width:820px;margin:20px auto;background:#fff;border:1px solid #ddd;border-radius:8px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.08)}
-    .hdr{padding:18px 24px;border-bottom:3px solid #7B4A2D;display:flex;justify-content:space-between;align-items:flex-start}
+    .hdr{padding:18px 24px;border-bottom:3px solid #0D6B37;display:flex;justify-content:space-between;align-items:flex-start}
     .hl{display:flex;align-items:center;gap:14px}
     .logo{width:90px;height:90px;object-fit:contain;flex-shrink:0}
     .emp h1{font-size:16px;font-weight:800;color:#333;margin-bottom:4px}
     .emp p{font-size:11px;color:#666;line-height:1.7}
-    .emp .timb{font-size:11px;color:#7B4A2D;font-weight:700;margin-top:3px}
+    .emp .timb{font-size:11px;color:#0D6B37;font-weight:700;margin-top:3px}
     .hr2{text-align:right}
     .dt{font-size:10px;font-weight:700;letter-spacing:2px;color:#999;text-transform:uppercase;margin-bottom:6px}
-    .dn{font-size:20px;font-weight:800;color:#7B4A2D;border:2px solid #7B4A2D;padding:4px 14px;border-radius:6px;background:#faf7f5;display:inline-block;margin-bottom:6px}
+    .dn{font-size:20px;font-weight:800;color:#0D6B37;border:2px solid #0D6B37;padding:4px 14px;border-radius:6px;background:#f0f9f3;display:inline-block;margin-bottom:6px}
     .df{font-size:13px;font-weight:600;color:#222}
     .info{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid #eee}
     .ic{padding:14px 24px}.ic:first-child{border-right:1px solid #eee}
     .ir{display:flex;gap:8px;margin-bottom:6px;font-size:12px}
     .il{font-weight:700;color:#555;min-width:100px;flex-shrink:0}
-    .iv{color:#222}.hi{color:#7B4A2D;font-weight:600}
+    .iv{color:#222}.hi{color:#0D6B37;font-weight:600}
     .tw{padding:14px 24px}
     .tbl{width:100%;border-collapse:collapse;font-size:12px}
-    .tbl th{background:#7B4A2D;color:#fff;padding:9px 8px;text-align:left;font-size:11px;font-weight:700}
+    .tbl th{background:#0D6B37;color:#fff;padding:9px 8px;text-align:left;font-size:11px;font-weight:700}
     .tbl th.r,.tbl td.r{text-align:right}
     .tbl td{padding:8px 8px;border-bottom:1px solid #f0f0f0}
-    .tbl tbody tr:nth-child(even) td{background:#faf7f5}
+    .tbl tbody tr:nth-child(even) td{background:#f0f9f3}
     .tots{padding:0 24px 18px;display:flex;justify-content:flex-end}
     .tb{border:1px solid #ddd;border-radius:8px;overflow:hidden;min-width:290px}
     .tr2{display:flex;justify-content:space-between;padding:8px 14px;font-size:12px;border-bottom:1px solid #f0f0f0}
-    .grand{background:#7B4A2D;color:#fff;font-size:14px;font-weight:800;border-bottom:none}
+    .grand{background:#0D6B37;color:#fff;font-size:14px;font-weight:800;border-bottom:none}
     .foot{background:#f5f5f5;border-top:1px solid #e0e0e0;padding:10px 24px;font-size:10px;color:#999;text-align:center}
   </style>
   <div class="wrap">
