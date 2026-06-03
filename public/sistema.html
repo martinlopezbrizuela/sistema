@@ -56,35 +56,24 @@
       <div class="panel active" id="panel-dashboard">
         <div id="dash-alerts"></div>
         <div class="kpi-grid" id="dash-kpis"></div>
+        <div class="card">
+          <div class="sec-title" style="margin-bottom:14px"><span class="dot"></span>Acciones R&#225;pidas</div>
+          <div class="quick-actions">
+            <div class="qa-btn" onclick="openModalPresupuesto()"><div class="qa-ico">📋</div><div class="qa-lbl">Nuevo Presupuesto</div></div>
+            <div class="qa-btn" onclick="openModalFactura()"><div class="qa-ico">🧾</div><div class="qa-lbl">Nueva Factura</div></div>
+            <div class="qa-btn" onclick="openModalCliente()"><div class="qa-ico">👤</div><div class="qa-lbl">Nuevo Cliente</div></div>
+            <div class="qa-btn" onclick="goPanel('agenda');setTimeout(openModalAgenda,100)"><div class="qa-ico">📅</div><div class="qa-lbl">Cargar Pago</div></div>
+          </div>
+        </div>
         <div class="dash-grid">
           <div class="card span2">
-            <div class="sec-hdr"><div class="sec-title"><span class="dot"></span>Ventas Últimos 6 Meses</div></div>
+            <div class="sec-hdr"><div class="sec-title"><span class="dot"></span>Ventas &#218;ltimos 6 Meses</div></div>
             <div class="bar-chart" id="dash-chart"></div>
             <div style="display:flex;justify-content:space-around;margin-top:6px" id="dash-chart-labels"></div>
           </div>
           <div class="card">
             <div class="sec-title" style="margin-bottom:14px"><span class="dot"></span>Estado de Cuentas</div>
             <div class="pie-wrap" id="dash-pie"></div>
-          </div>
-        </div>
-        <div class="dash-grid">
-          <div class="card">
-            <div class="sec-hdr">
-              <div class="sec-title"><span class="dot"></span>Stock Bajo / Sin Stock</div>
-              <button class="btn-t br" onclick="goPanel('stock')" style="padding:4px 10px;font-size:11px">Ver →</button>
-            </div>
-            <div id="dash-stock-bajo"></div>
-          </div>
-          <div class="card">
-            <div class="sec-title" style="margin-bottom:12px"><span class="dot"></span>Top 5 Más Vendidos</div>
-            <div id="dash-top5"></div>
-          </div>
-          <div class="card">
-            <div class="sec-hdr">
-              <div class="sec-title"><span class="dot"></span>Últimas Facturas</div>
-              <button class="btn-t br" onclick="goPanel('facturas')" style="padding:4px 10px;font-size:11px">Ver →</button>
-            </div>
-            <div id="dash-ult-facs"></div>
           </div>
         </div>
         <div class="dash-grid" style="margin-top:0">
@@ -97,13 +86,24 @@
             <div id="dash-meta-mensual"></div>
           </div>
         </div>
-        <div class="card">
-          <div class="sec-title" style="margin-bottom:14px"><span class="dot"></span>Acciones Rápidas</div>
-          <div class="quick-actions">
-            <div class="qa-btn" onclick="openModalPresupuesto()"><div class="qa-ico">📋</div><div class="qa-lbl">Nuevo Presupuesto</div></div>
-            <div class="qa-btn" onclick="openModalFactura()"><div class="qa-ico">🧾</div><div class="qa-lbl">Nueva Factura</div></div>
-            <div class="qa-btn" onclick="openModalCliente()"><div class="qa-ico">👤</div><div class="qa-lbl">Nuevo Cliente</div></div>
-            <div class="qa-btn" onclick="goPanel('agenda');setTimeout(openModalAgenda,100)"><div class="qa-ico">📅</div><div class="qa-lbl">Cargar Pago</div></div>
+        <div class="dash-grid">
+          <div class="card">
+            <div class="sec-hdr">
+              <div class="sec-title"><span class="dot"></span>Stock Bajo / Sin Stock</div>
+              <button class="btn-t br" onclick="goPanel('stock')" style="padding:4px 10px;font-size:11px">Ver &#8594;</button>
+            </div>
+            <div id="dash-stock-bajo"></div>
+          </div>
+          <div class="card">
+            <div class="sec-title" style="margin-bottom:12px"><span class="dot"></span>Top 5 M&#225;s Vendidos</div>
+            <div id="dash-top5"></div>
+          </div>
+          <div class="card">
+            <div class="sec-hdr">
+              <div class="sec-title"><span class="dot"></span>&#218;ltimas Facturas</div>
+              <button class="btn-t br" onclick="goPanel('facturas')" style="padding:4px 10px;font-size:11px">Ver &#8594;</button>
+            </div>
+            <div id="dash-ult-facs"></div>
           </div>
         </div>
       </div>
@@ -412,7 +412,14 @@
     <input type="hidden" id="prod-id"/>
     <div class="form-grid">
       <div class="fld"><label>Código</label><input type="text" id="prod-cod" placeholder="PRD-001"/></div>
-      <div class="fld"><label>Categoría</label><input type="text" id="prod-cat" placeholder="Antiparasitario..."/></div>
+      <div class="fld"><label>Categor&#237;a</label>
+        <select id="prod-cat">
+          <option value="">— Seleccionar —</option>
+          <option value="Medicamentos">Medicamentos</option>
+          <option value="Insumos">Insumos</option>
+          <option value="Propios">Propios</option>
+        </select>
+      </div>
       <div class="fld wide"><label>Nombre *</label><input type="text" id="prod-nombre" placeholder="Nombre del producto..."/></div>
       <div class="fld"><label>Unidad</label><input type="text" id="prod-unidad" placeholder="L, ml, kg, dosis..."/></div>
       <div class="fld"><label>P. Costo (Gs.)</label><input type="number" id="prod-costo" min="0" value="0"/></div>
