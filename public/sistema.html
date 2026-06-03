@@ -55,6 +55,7 @@
       <div class="panel active" id="panel-dashboard">
         <div id="dash-alerts"></div>
         <div class="kpi-grid" id="dash-kpis"></div>
+        <!-- FILA 1: ACCIONES RÁPIDAS -->
         <div class="card">
           <div class="sec-title" style="margin-bottom:14px"><span class="dot"></span>Acciones R&#225;pidas</div>
           <div class="quick-actions">
@@ -64,27 +65,30 @@
             <div class="qa-btn" onclick="goPanel('agenda');setTimeout(openModalAgenda,100)"><div class="qa-ico">📅</div><div class="qa-lbl">Cargar Pago</div></div>
           </div>
         </div>
+        <!-- FILA 2: META MENSUAL + ESTADO DE CUENTAS -->
         <div class="dash-grid">
-          <div class="card">
-            <div class="sec-title" style="margin-bottom:14px"><span class="dot"></span>Estado de Cuentas</div>
-            <div class="pie-wrap" id="dash-pie"></div>
-          </div>
           <div class="card span2">
             <div class="sec-title" style="margin-bottom:14px"><span class="dot"></span>Meta mensual &#8212; Gs. 400.000.000</div>
             <div id="dash-meta-mensual"></div>
           </div>
+          <div class="card">
+            <div class="sec-title" style="margin-bottom:14px"><span class="dot"></span>Estado de Cuentas</div>
+            <div class="pie-wrap" id="dash-pie"></div>
+          </div>
         </div>
+        <!-- FILA 3: CATEGORÍAS + VENTAS 6 MESES -->
         <div class="dash-grid" style="margin-top:0">
+          <div class="card">
+            <div class="sec-title" style="margin-bottom:14px"><span class="dot"></span>Categor&#237;as m&#225;s vendidas</div>
+            <div id="dash-pie-cats"></div>
+          </div>
           <div class="card span2">
             <div class="sec-hdr"><div class="sec-title"><span class="dot"></span>Ventas &#218;ltimos 6 Meses</div></div>
             <div class="bar-chart" id="dash-chart"></div>
             <div style="display:flex;justify-content:space-around;margin-top:6px" id="dash-chart-labels"></div>
           </div>
-          <div class="card">
-            <div class="sec-title" style="margin-bottom:14px"><span class="dot"></span>Categor&#237;as m&#225;s vendidas</div>
-            <div id="dash-pie-cats"></div>
-          </div>
         </div>
+        <!-- FILA 4: STOCK + TOP5 + ÚLTIMAS FACTURAS -->
         <div class="dash-grid">
           <div class="card">
             <div class="sec-hdr">
