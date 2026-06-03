@@ -828,6 +828,18 @@ function renderFacturas() {
   const filter=tabFilters.facturas||'todos';
   let data=[...facturas].sort((a,b)=>b.id-a.id);
   if (filter!=='todos') data=data.filter(f=>f.estado===filter);
+
+  // Mini stats
+  const totalFac = facturas.reduce((s,f)=>s+Number(f.total||0),0);
+  const totalContado = facturas.filter(f=>f.condicion==='contado').reduce((s,f)=>s+Number(f.total||0),0);
+  const totalCredito = facturas.filter(f=>f.condicion==='credito').reduce((s,f)=>s+Number(f.total||0),0);
+  const statsEl = document.getElementById('fac-mini-stats');
+  if (statsEl) statsEl.innerHTML = `
+    <div class="mini-stat"><div class="val" style="color:var(--green)">Gs.${fmt(totalFac)}</div><div class="lbl">Total facturado</div></div>
+    <div class="mini-stat"><div class="val" style="color:var(--blue)">Gs.${fmt(totalContado)}</div><div class="lbl">Contado</div></div>
+    <div class="mini-stat"><div class="val" style="color:var(--amber)">Gs.${fmt(totalCredito)}</div><div class="lbl">Crédito</div></div>
+  `;
+
   const tb=document.getElementById('tabla-facturas');
   if (!data.length) { tb.innerHTML=`<tr><td colspan="11"><div class="empty"><div class="icon">🧾</div>Sin facturas</div></td></tr>`; return; }
   tb.innerHTML=data.map(f=>{
