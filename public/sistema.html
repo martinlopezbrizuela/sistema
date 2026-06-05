@@ -207,7 +207,7 @@
     <button class="modal-close" onclick="closeModal('modal-presupuesto')">✕</button>
     <input type="hidden" id="presu-id"/>
     <div class="form-grid">
-      <div class="fld"><label>Cliente *</label><select id="presu-cliente"></select></div>
+      <div class="fld"><label>Cliente *</label><div style="position:relative"><input type="text" id="presu-cliente" autocomplete="off" placeholder="🔍 Buscar cliente..." data-cliente-id="" style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--ff);color:var(--text);outline:none"/><div id="presu-cliente-drop" class="prod-dropdown" style="display:none"></div></div></div>
       <div class="fld"><label>Fecha</label><input type="date" id="presu-fecha"/></div>
       <div class="fld"><label>N° Presupuesto</label><input type="text" id="presu-num" readonly/></div>
       <div class="fld"><label>Validez (días)</label><input type="number" id="presu-validez" value="7" min="1"/></div>
@@ -234,7 +234,7 @@
     <input type="hidden" id="fac-pedido-id"/>
     <input type="hidden" id="fac-presu-id"/>
     <div class="form-grid">
-      <div class="fld"><label>Cliente *</label><select id="fac-cliente"></select></div>
+      <div class="fld"><label>Cliente *</label><div style="position:relative"><input type="text" id="fac-cliente" autocomplete="off" placeholder="🔍 Buscar cliente..." data-cliente-id="" style="width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--ff);color:var(--text);outline:none"/><div id="fac-cliente-drop" class="prod-dropdown" style="display:none"></div></div></div>
       <div class="fld"><label>Fecha</label><input type="date" id="fac-fecha"/></div>
       <div class="fld"><label>Timbrado *</label><input type="text" id="fac-timbrado" placeholder="16851126"/></div>
       <div class="fld"><label>N° Factura (auto)</label><input type="text" id="fac-num-display" readonly/></div>
