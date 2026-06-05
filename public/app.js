@@ -826,10 +826,8 @@ function facturarPedido(id) {
 // ═══════════════════════════════
 function renderFacturas() {
   const filter=tabFilters.facturas||'todos';
-  let data=[...facturas].sort((a,b)=>b.id-a.id);
-  if (filter!=='todos') data=data.filter(f=>f.estado===filter);
 
-  // Mini stats
+  // Mini stats — siempre sobre TODAS las facturas
   const totalFac = facturas.reduce((s,f)=>s+Number(f.total||0),0);
   const totalContado = facturas.filter(f=>f.condicion==='contado').reduce((s,f)=>s+Number(f.total||0),0);
   const totalCredito = facturas.filter(f=>f.condicion==='credito').reduce((s,f)=>s+Number(f.total||0),0);
@@ -840,27 +838,85 @@ function renderFacturas() {
     <div class="mini-stat"><div class="val" style="color:var(--amber)">Gs.${fmt(totalCredito)}</div><div class="lbl">Crédito</div></div>
   `;
 
-  const tb=document.getElementById('tabla-facturas');
-  if (!data.length) { tb.innerHTML=`<tr><td colspan="11"><div class="empty"><div class="icon">🧾</div>Sin facturas</div></td></tr>`; return; }
-  tb.innerHTML=data.map(f=>{
-    const acc=[`<button class="btn-t gr" onclick="verDocumento('fac',${f.id})">👁</button>`];
-    if (f.condicion==='credito'&&f.estado!=='pagada') acc.push(`<button class="btn-t g" onclick="openPago(${f.id})">💰 Pago</button>`);
-    acc.push(`<button class="btn-t r" onclick="delFactura(${f.id})">🗑</button>`);
-    return `<tr>
-      <td style="font-family:var(--fm);font-size:11px;color:var(--g2)">${f.num}</td>
-      <td style="font-family:var(--fm);font-size:10px;color:var(--text3)">${he(f.timbrado||'—')}</td>
-      <td style="font-size:12px;color:var(--text3)">${fmtD(f.fecha)}</td>
-      <td style="font-weight:600">${he(nomCli(f.clienteId))}</td>
-      <td class="r" style="font-family:var(--fm);font-size:11px">Gs.${fmt(f.exento||0)}</td>
-      <td class="r" style="font-family:var(--fm);font-size:11px;color:var(--amber)">Gs.${fmt(f.iva||0)}</td>
-      <td class="r" style="font-family:var(--fm);font-weight:700;color:var(--g2)">Gs.${fmt(f.total)}</td>
-      <td><span class="badge ${f.condicion==='credito'?'amber':'green'}">${f.condicion==='credito'?'Crédito':'Contado'}</span></td>
-      <td style="font-size:12px;color:var(--text3)">${fmtD(f.fechaVenc)}</td>
-      <td>${badgeFac(f.estado)}</td>
-      <td><div class="act-group">${acc.join('')}</div></td>
+  const tb = document.getElementById('tabla-facturas');
+
+  // Si hay un cliente expandido, mostrar sus facturas
+  const expandedId = window._facExpandedCli || null;
+
+  // Filtrar facturas según tab
+  let facsFiltradas = [...facturas];
+  if (filter !== 'todos') facsFiltradas = facsFiltradas.filter(f => f.estado === filter);
+
+  if (!facsFiltradas.length) {
+    tb.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="icon">🧾</div>Sin facturas</div></td></tr>`;
+    return;
+  }
+
+  // Agrupar por cliente
+  const grupos = {};
+  facsFiltradas.forEach(f => {
+    const cid = f.clienteId || '__sin_cliente__';
+    if (!grupos[cid]) grupos[cid] = { clienteId: cid, nombre: nomCli(f.clienteId)||'Sin cliente', facturas: [] };
+    grupos[cid].facturas.push(f);
+  });
+
+  let html = '';
+  Object.values(grupos).sort((a,b)=>a.nombre.localeCompare(b.nombre)).forEach(g => {
+    const totalG = g.facturas.reduce((s,f)=>s+Number(f.total||0),0);
+    const pagadoG = g.facturas.reduce((s,f)=>s+Number(f.pagado||0),0);
+    const saldoG = totalG - pagadoG;
+    const nFacs = g.facturas.length;
+    const isExpanded = expandedId === g.clienteId;
+    const tieneDeuda = saldoG > 0;
+
+    // Fila resumen del cliente
+    html += `<tr class="fac-cli-row" onclick="toggleFacCliente('${g.clienteId}')" style="cursor:pointer;background:${isExpanded?'var(--green-bg)':'var(--bg)'};border-left:3px solid ${tieneDeuda?'var(--amber)':'var(--green)'}">
+      <td style="padding:12px 10px;font-weight:700;color:var(--text);font-size:13px">
+        <span style="margin-right:8px;font-size:10px;color:var(--text3)">${isExpanded?'▼':'▶'}</span>
+        ${he(g.nombre)}
+      </td>
+      <td style="padding:12px 10px;text-align:center">
+        <span class="badge gray" style="font-size:11px">${nFacs} factura${nFacs!==1?'s':''}</span>
+      </td>
+      <td class="r" style="padding:12px 10px;font-family:var(--fm);font-weight:700;color:var(--text)">Gs.${fmt(totalG)}</td>
+      <td class="r" style="padding:12px 10px;font-family:var(--fm);color:var(--green)">Gs.${fmt(pagadoG)}</td>
+      <td class="r" style="padding:12px 10px;font-family:var(--fm);font-weight:700;color:${tieneDeuda?'var(--red)':'var(--green)'}">Gs.${fmt(saldoG)}</td>
+      <td style="padding:12px 10px;text-align:center">
+        ${tieneDeuda?'<span class="badge red">Con deuda</span>':'<span class="badge green">Al día</span>'}
+      </td>
     </tr>`;
-  }).join('');
+
+    // Filas de facturas individuales (colapsables)
+    if (isExpanded) {
+      g.facturas.sort((a,b)=>b.id-a.id).forEach(f => {
+        const acc = [`<button class="btn-t gr" onclick="event.stopPropagation();verDocumento('fac',${f.id})">👁</button>`];
+        if (f.condicion==='credito'&&f.estado!=='pagada') acc.push(`<button class="btn-t g" onclick="event.stopPropagation();openPago(${f.id})">💰</button>`);
+        acc.push(`<button class="btn-t r" onclick="event.stopPropagation();delFactura(${f.id})">🗑</button>`);
+        html += `<tr style="background:#f8fdf9;border-left:3px solid var(--green)">
+          <td style="padding:8px 10px 8px 32px;font-size:12px;color:var(--text3)">
+            <span style="font-family:var(--fm);color:var(--green);font-size:11px">${f.num}</span>
+            · ${fmtD(f.fecha)}
+            · <span class="badge ${f.condicion==='credito'?'amber':'green'}" style="font-size:10px">${f.condicion==='credito'?'Crédito':'Contado'}</span>
+          </td>
+          <td style="padding:8px 10px;font-size:11px;color:var(--text3)">Timb: ${he(f.timbrado||'—')} ${f.fechaVenc?'· Vence: '+fmtD(f.fechaVenc):''}</td>
+          <td class="r" style="padding:8px 10px;font-family:var(--fm);font-size:12px">Gs.${fmt(f.total)}</td>
+          <td class="r" style="padding:8px 10px;font-family:var(--fm);font-size:12px;color:var(--green)">Gs.${fmt(f.pagado||0)}</td>
+          <td class="r" style="padding:8px 10px;font-family:var(--fm);font-size:12px;color:${(f.total-(f.pagado||0))>0?'var(--red)':'var(--green)'}">Gs.${fmt(f.total-(f.pagado||0))}</td>
+          <td style="padding:8px 10px"><div class="act-group">${badgeFac(f.estado)} ${acc.join('')}</div></td>
+        </tr>`;
+      });
+    }
+  });
+
+  tb.innerHTML = html;
 }
+
+function toggleFacCliente(cid) {
+  window._facExpandedCli = (window._facExpandedCli === cid) ? null : cid;
+  renderFacturas();
+}
+
+
 
 function openModalFactura() {
   itemsFac=[];
