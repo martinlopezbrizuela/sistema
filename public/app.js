@@ -122,11 +122,90 @@ function openModal(id)  { document.getElementById(id).classList.add('open'); }
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 
 // ── FILLS ──
-function fillCliSel(selId, val) {
-  const s = document.getElementById(selId);
-  s.innerHTML = '<option value="">— Cliente —</option>' +
-    clientes.map(c => `<option value="${c.id}"${c.id===val?' selected':''}>${he(c.nombre)}</option>`).join('');
+function fillCliSel(inputId, val) {
+  // Convertir el select en buscador autocomplete
+  const container = document.getElementById(inputId);
+  if (!container) return;
+  // Si es un select, reemplazarlo con el nuevo componente
+  if (container.tagName === 'SELECT') {
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position:relative';
+    wrapper.id = inputId + '-wrapper';
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.id = inputId;
+    input.autocomplete = 'off';
+    input.placeholder = '🔍 Buscar cliente...';
+    input.dataset.clienteId = '';
+    input.style.cssText = 'width:100%;padding:9px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;font-size:13px;font-family:var(--ff);color:var(--text);outline:none';
+    const drop = document.createElement('div');
+    drop.id = inputId + '-drop';
+    drop.className = 'prod-dropdown';
+    drop.style.display = 'none';
+    wrapper.appendChild(input);
+    wrapper.appendChild(drop);
+    container.parentNode.replaceChild(wrapper, container);
+    _cliSearchBind(inputId, val);
+  } else {
+    // Ya es input — solo actualizar el valor
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    input.dataset.clienteId = '';
+    input.value = '';
+    if (val) {
+      const c = clientes.find(x=>x.id===val);
+      if (c) { input.value = c.nombre; input.dataset.clienteId = c.id; }
+    }
+    _cliSearchBind(inputId, val);
+  }
 }
+
+function _cliSearchBind(inputId, val) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  if (val) {
+    const c = clientes.find(x=>x.id===val);
+    if (c) { input.value = c.nombre; input.dataset.clienteId = String(c.id); }
+  }
+  input.oninput = () => _cliFilterDrop(inputId);
+  input.onfocus = () => _cliFilterDrop(inputId);
+  input.onblur = () => setTimeout(()=>{ const d=document.getElementById(inputId+'-drop'); if(d) d.style.display='none'; }, 200);
+}
+
+function _cliFilterDrop(inputId) {
+  const input = document.getElementById(inputId);
+  const drop = document.getElementById(inputId+'-drop');
+  if (!input||!drop) return;
+  const q = input.value.toLowerCase().trim();
+  const matches = q
+    ? clientes.filter(c=>c.nombre.toLowerCase().includes(q)||(c.ruc||'').toLowerCase().includes(q)).slice(0,8)
+    : clientes.slice(0,10);
+  if (!matches.length) { drop.style.display='none'; return; }
+  drop.innerHTML = matches.map(c=>
+    `<div class="prod-drop-item" onmousedown="_cliSelect('${inputId}',${c.id})">
+      <span class="pdi-name">${he(c.nombre)}</span>
+      <span class="pdi-price" style="color:var(--text3);font-size:10px">${he(c.ruc||'')}</span>
+    </div>`
+  ).join('');
+  drop.style.display = 'block';
+}
+
+function _cliSelect(inputId, id) {
+  const c = clientes.find(x=>x.id===id); if(!c) return;
+  const input = document.getElementById(inputId);
+  if (input) { input.value = c.nombre; input.dataset.clienteId = String(c.id); }
+  const drop = document.getElementById(inputId+'-drop');
+  if (drop) drop.style.display = 'none';
+}
+
+function _getCliId(inputId) {
+  const input = document.getElementById(inputId);
+  if (!input) return null;
+  const id = parseInt(input.dataset.clienteId);
+  return isNaN(id) ? null : id;
+}
+
+
 function fillProvSel(selId, val) {
   const s = document.getElementById(selId);
   s.innerHTML = '<option value="">— Proveedor (opcional) —</option>' +
@@ -619,7 +698,7 @@ function editPresupuesto(id) {
 }
 
 function savePresupuesto() {
-  const cliId = parseInt(document.getElementById('presu-cliente').value);
+  const cliId = _getCliId('presu-cliente');
   if (!cliId) { toast('Seleccioná un cliente','w'); return; }
   if (!itemsPresu.length) { toast('Agregá al menos un producto','w'); return; }
   const tots = totalesFromItems(itemsPresu);
@@ -826,8 +905,10 @@ function facturarPedido(id) {
 // ═══════════════════════════════
 function renderFacturas() {
   const filter=tabFilters.facturas||'todos';
+  let data=[...facturas].sort((a,b)=>b.id-a.id);
+  if (filter!=='todos') data=data.filter(f=>f.estado===filter);
 
-  // Mini stats — siempre sobre TODAS las facturas
+  // Mini stats
   const totalFac = facturas.reduce((s,f)=>s+Number(f.total||0),0);
   const totalContado = facturas.filter(f=>f.condicion==='contado').reduce((s,f)=>s+Number(f.total||0),0);
   const totalCredito = facturas.filter(f=>f.condicion==='credito').reduce((s,f)=>s+Number(f.total||0),0);
@@ -838,85 +919,27 @@ function renderFacturas() {
     <div class="mini-stat"><div class="val" style="color:var(--amber)">Gs.${fmt(totalCredito)}</div><div class="lbl">Crédito</div></div>
   `;
 
-  const tb = document.getElementById('tabla-facturas');
-
-  // Si hay un cliente expandido, mostrar sus facturas
-  const expandedId = window._facExpandedCli || null;
-
-  // Filtrar facturas según tab
-  let facsFiltradas = [...facturas];
-  if (filter !== 'todos') facsFiltradas = facsFiltradas.filter(f => f.estado === filter);
-
-  if (!facsFiltradas.length) {
-    tb.innerHTML = `<tr><td colspan="6"><div class="empty"><div class="icon">🧾</div>Sin facturas</div></td></tr>`;
-    return;
-  }
-
-  // Agrupar por cliente
-  const grupos = {};
-  facsFiltradas.forEach(f => {
-    const cid = f.clienteId || '__sin_cliente__';
-    if (!grupos[cid]) grupos[cid] = { clienteId: cid, nombre: nomCli(f.clienteId)||'Sin cliente', facturas: [] };
-    grupos[cid].facturas.push(f);
-  });
-
-  let html = '';
-  Object.values(grupos).sort((a,b)=>a.nombre.localeCompare(b.nombre)).forEach(g => {
-    const totalG = g.facturas.reduce((s,f)=>s+Number(f.total||0),0);
-    const pagadoG = g.facturas.reduce((s,f)=>s+Number(f.pagado||0),0);
-    const saldoG = totalG - pagadoG;
-    const nFacs = g.facturas.length;
-    const isExpanded = expandedId === g.clienteId;
-    const tieneDeuda = saldoG > 0;
-
-    // Fila resumen del cliente
-    html += `<tr class="fac-cli-row" onclick="toggleFacCliente('${g.clienteId}')" style="cursor:pointer;background:${isExpanded?'var(--green-bg)':'var(--bg)'};border-left:3px solid ${tieneDeuda?'var(--amber)':'var(--green)'}">
-      <td style="padding:12px 10px;font-weight:700;color:var(--text);font-size:13px">
-        <span style="margin-right:8px;font-size:10px;color:var(--text3)">${isExpanded?'▼':'▶'}</span>
-        ${he(g.nombre)}
-      </td>
-      <td style="padding:12px 10px;text-align:center">
-        <span class="badge gray" style="font-size:11px">${nFacs} factura${nFacs!==1?'s':''}</span>
-      </td>
-      <td class="r" style="padding:12px 10px;font-family:var(--fm);font-weight:700;color:var(--text)">Gs.${fmt(totalG)}</td>
-      <td class="r" style="padding:12px 10px;font-family:var(--fm);color:var(--green)">Gs.${fmt(pagadoG)}</td>
-      <td class="r" style="padding:12px 10px;font-family:var(--fm);font-weight:700;color:${tieneDeuda?'var(--red)':'var(--green)'}">Gs.${fmt(saldoG)}</td>
-      <td style="padding:12px 10px;text-align:center">
-        ${tieneDeuda?'<span class="badge red">Con deuda</span>':'<span class="badge green">Al día</span>'}
-      </td>
+  const tb=document.getElementById('tabla-facturas');
+  if (!data.length) { tb.innerHTML=`<tr><td colspan="11"><div class="empty"><div class="icon">🧾</div>Sin facturas</div></td></tr>`; return; }
+  tb.innerHTML=data.map(f=>{
+    const acc=[`<button class="btn-t gr" onclick="verDocumento('fac',${f.id})">👁</button>`];
+    if (f.condicion==='credito'&&f.estado!=='pagada') acc.push(`<button class="btn-t g" onclick="openPago(${f.id})">💰 Pago</button>`);
+    acc.push(`<button class="btn-t r" onclick="delFactura(${f.id})">🗑</button>`);
+    return `<tr>
+      <td style="font-family:var(--fm);font-size:11px;color:var(--g2)">${f.num}</td>
+      <td style="font-family:var(--fm);font-size:10px;color:var(--text3)">${he(f.timbrado||'—')}</td>
+      <td style="font-size:12px;color:var(--text3)">${fmtD(f.fecha)}</td>
+      <td style="font-weight:600">${he(nomCli(f.clienteId))}</td>
+      <td class="r" style="font-family:var(--fm);font-size:11px">Gs.${fmt(f.exento||0)}</td>
+      <td class="r" style="font-family:var(--fm);font-size:11px;color:var(--amber)">Gs.${fmt(f.iva||0)}</td>
+      <td class="r" style="font-family:var(--fm);font-weight:700;color:var(--g2)">Gs.${fmt(f.total)}</td>
+      <td><span class="badge ${f.condicion==='credito'?'amber':'green'}">${f.condicion==='credito'?'Crédito':'Contado'}</span></td>
+      <td style="font-size:12px;color:var(--text3)">${fmtD(f.fechaVenc)}</td>
+      <td>${badgeFac(f.estado)}</td>
+      <td><div class="act-group">${acc.join('')}</div></td>
     </tr>`;
-
-    // Filas de facturas individuales (colapsables)
-    if (isExpanded) {
-      g.facturas.sort((a,b)=>b.id-a.id).forEach(f => {
-        const acc = [`<button class="btn-t gr" onclick="event.stopPropagation();verDocumento('fac',${f.id})">👁</button>`];
-        if (f.condicion==='credito'&&f.estado!=='pagada') acc.push(`<button class="btn-t g" onclick="event.stopPropagation();openPago(${f.id})">💰</button>`);
-        acc.push(`<button class="btn-t r" onclick="event.stopPropagation();delFactura(${f.id})">🗑</button>`);
-        html += `<tr style="background:#f8fdf9;border-left:3px solid var(--green)">
-          <td style="padding:8px 10px 8px 32px;font-size:12px;color:var(--text3)">
-            <span style="font-family:var(--fm);color:var(--green);font-size:11px">${f.num}</span>
-            · ${fmtD(f.fecha)}
-            · <span class="badge ${f.condicion==='credito'?'amber':'green'}" style="font-size:10px">${f.condicion==='credito'?'Crédito':'Contado'}</span>
-          </td>
-          <td style="padding:8px 10px;font-size:11px;color:var(--text3)">Timb: ${he(f.timbrado||'—')} ${f.fechaVenc?'· Vence: '+fmtD(f.fechaVenc):''}</td>
-          <td class="r" style="padding:8px 10px;font-family:var(--fm);font-size:12px">Gs.${fmt(f.total)}</td>
-          <td class="r" style="padding:8px 10px;font-family:var(--fm);font-size:12px;color:var(--green)">Gs.${fmt(f.pagado||0)}</td>
-          <td class="r" style="padding:8px 10px;font-family:var(--fm);font-size:12px;color:${(f.total-(f.pagado||0))>0?'var(--red)':'var(--green)'}">Gs.${fmt(f.total-(f.pagado||0))}</td>
-          <td style="padding:8px 10px"><div class="act-group">${badgeFac(f.estado)} ${acc.join('')}</div></td>
-        </tr>`;
-      });
-    }
-  });
-
-  tb.innerHTML = html;
+  }).join('');
 }
-
-function toggleFacCliente(cid) {
-  window._facExpandedCli = (window._facExpandedCli === cid) ? null : cid;
-  renderFacturas();
-}
-
-
 
 function openModalFactura() {
   itemsFac=[];
@@ -940,7 +963,7 @@ function facCondChanged() {
   document.getElementById('fac-dias-wrap').style.display=cred?'':'none';
 }
 function saveFactura() {
-  const cliId=parseInt(document.getElementById('fac-cliente').value);
+  const cliId=_getCliId('fac-cliente');
   if (!cliId) { toast('Seleccioná un cliente','w'); return; }
   if (!itemsFac.length) { toast('Agregá al menos un producto','w'); return; }
   const timbrado=document.getElementById('fac-timbrado').value.trim();
