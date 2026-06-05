@@ -1016,21 +1016,87 @@ function renderCobrar() {
     <div class="mini-stat"><div class="val" style="color:var(--red)">${nVenc}</div><div class="lbl">Facturas vencidas</div></div>
     <div class="mini-stat"><div class="val" style="color:var(--blue)">${creds.filter(f=>f.estado==='pago_parcial').length}</div><div class="lbl">Pago parcial</div></div>
   </div>`;
-  const data=[...creds].sort((a,b)=>diasMora(b.fechaVenc)-diasMora(a.fechaVenc));
+
   const tb=document.getElementById('tabla-cobrar');
-  if (!data.length) { tb.innerHTML=`<tr><td colspan="9"><div class="empty"><div class="icon">💰</div>Sin cuentas a cobrar</div></td></tr>`; return; }
-  tb.innerHTML=data.map(f=>`<tr>
-    <td style="font-family:var(--fm);font-size:11px;color:var(--g2)">${f.num}</td>
-    <td style="font-weight:600">${he(nomCli(f.clienteId))}</td>
-    <td class="r" style="font-family:var(--fm)">Gs.${fmt(f.total)}</td>
-    <td class="r" style="font-family:var(--fm);color:var(--g2)">Gs.${fmt(f.pagado||0)}</td>
-    <td class="r" style="font-family:var(--fm);font-weight:700;color:${f.saldo>0?'var(--amber)':'var(--g2)'}">Gs.${fmt(f.saldo||0)}</td>
-    <td style="font-size:12px;color:var(--text3)">${fmtD(f.fechaVenc)}</td>
-    <td>${moraChip(f.fechaVenc,f.estado)}</td>
-    <td>${badgeFac(f.estado)}</td>
-    <td><div class="act-group">${f.estado!=='pagada'?`<button class="btn-t g" onclick="openPago(${f.id})">💰 Pagar</button>`:'<span style="font-family:var(--fm);font-size:10px;color:var(--g2)">✓</span>'}</div></td>
-  </tr>`).join('');
+  // Solo créditos pendientes/parciales agrupados por cliente
+  const pendientes = creds.filter(f=>f.estado!=='pagada');
+  if (!pendientes.length) {
+    tb.innerHTML=`<tr><td colspan="5"><div class="empty"><div class="icon">💰</div>Sin cuentas a cobrar</div></td></tr>`;
+    return;
+  }
+
+  // Agrupar por cliente
+  const grupos = {};
+  pendientes.forEach(f => {
+    const cid = f.clienteId || '__sin_cliente__';
+    if (!grupos[cid]) grupos[cid] = { clienteId: cid, nombre: nomCli(f.clienteId)||'Sin cliente', facturas: [] };
+    grupos[cid].facturas.push(f);
+  });
+
+  const expandedId = window._cobrarExpandedCli || null;
+  let html = '';
+
+  Object.values(grupos).sort((a,b)=>{
+    // Ordenar: vencidos primero, luego por monto
+    const aVenc = a.facturas.some(f=>diasMora(f.fechaVenc)>0);
+    const bVenc = b.facturas.some(f=>diasMora(f.fechaVenc)>0);
+    if (aVenc && !bVenc) return -1;
+    if (!aVenc && bVenc) return 1;
+    const aSaldo = a.facturas.reduce((s,f)=>s+Number(f.saldo||0),0);
+    const bSaldo = b.facturas.reduce((s,f)=>s+Number(f.saldo||0),0);
+    return bSaldo - aSaldo;
+  }).forEach(g => {
+    const saldoG = g.facturas.reduce((s,f)=>s+Number(f.saldo||0),0);
+    const pagadoG = g.facturas.reduce((s,f)=>s+Number(f.pagado||0),0);
+    const totalG = g.facturas.reduce((s,f)=>s+Number(f.total||0),0);
+    const nFacs = g.facturas.length;
+    const tieneVenc = g.facturas.some(f=>diasMora(f.fechaVenc)>0);
+    const isExpanded = expandedId === g.clienteId;
+
+    html += `<tr onclick="toggleCobrarCliente('${g.clienteId}')" style="cursor:pointer;background:${isExpanded?'var(--green-bg)':'var(--bg)'};border-left:3px solid ${tieneVenc?'var(--red)':'var(--amber)'}">
+      <td style="padding:12px 10px;font-weight:700;color:var(--text);font-size:13px">
+        <span style="margin-right:8px;font-size:10px;color:var(--text3)">${isExpanded?'▼':'▶'}</span>
+        ${he(g.nombre)}
+        <span class="badge ${tieneVenc?'red':'amber'}" style="margin-left:8px;font-size:10px">${nFacs} factura${nFacs!==1?'s':''}</span>
+      </td>
+      <td class="r" style="padding:12px 10px;font-family:var(--fm);color:var(--text3)">Gs.${fmt(pagadoG)}</td>
+      <td class="r" style="padding:12px 10px;font-family:var(--fm);font-weight:800;font-size:14px;color:${tieneVenc?'var(--red)':'var(--amber)'}">Gs.${fmt(saldoG)}</td>
+      <td style="padding:12px 10px;text-align:center">${tieneVenc?'<span class="mora-chip late">Con mora</span>':'<span class="mora-chip ok">Al día</span>'}</td>
+      <td style="padding:12px 10px"></td>
+    </tr>`;
+
+    if (isExpanded) {
+      g.facturas.sort((a,b)=>diasMora(b.fechaVenc)-diasMora(a.fechaVenc)).forEach(f => {
+        const mora = diasMora(f.fechaVenc);
+        html += `<tr style="background:#fffdf0;border-left:3px solid ${mora>0?'var(--red)':'var(--amber)'}">
+          <td style="padding:8px 10px 8px 32px;font-size:12px">
+            <span style="font-family:var(--fm);color:var(--green);font-size:11px">${f.num}</span>
+            · ${fmtD(f.fecha)} · vence ${fmtD(f.fechaVenc)}
+          </td>
+          <td class="r" style="padding:8px 10px;font-family:var(--fm);font-size:12px;color:var(--green)">Gs.${fmt(f.pagado||0)}</td>
+          <td class="r" style="padding:8px 10px;font-family:var(--fm);font-weight:700;color:${mora>0?'var(--red)':'var(--amber)'}">Gs.${fmt(f.saldo||0)}</td>
+          <td style="padding:8px 10px">${moraChip(f.fechaVenc,f.estado)}</td>
+          <td style="padding:8px 10px">
+            <div class="act-group">
+              ${badgeFac(f.estado)}
+              <button class="btn-t g" onclick="event.stopPropagation();openPago(${f.id})">💰 Pagar</button>
+              <button class="btn-t gr" onclick="event.stopPropagation();verDocumento('fac',${f.id})">👁</button>
+            </div>
+          </td>
+        </tr>`;
+      });
+    }
+  });
+
+  tb.innerHTML = html;
 }
+
+function toggleCobrarCliente(cid) {
+  window._cobrarExpandedCli = (window._cobrarExpandedCli === cid) ? null : cid;
+  renderCobrar();
+}
+
+
 function openPago(facId) {
   const f=facturas.find(x=>x.id===facId); if(!f) return;
   document.getElementById('pago-fac-id').value=facId;
