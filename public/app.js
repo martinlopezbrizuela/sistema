@@ -1033,7 +1033,7 @@ function renderCobrar() {
     grupos[cid].facturas.push(f);
   });
 
-  const expandedId = window._cobrarExpandedCli || null;
+  const expandedId = window._cobrarExpandedCli !== undefined ? String(window._cobrarExpandedCli) : null;
   let html = '';
 
   Object.values(grupos).sort((a,b)=>{
@@ -1051,18 +1051,23 @@ function renderCobrar() {
     const totalG = g.facturas.reduce((s,f)=>s+Number(f.total||0),0);
     const nFacs = g.facturas.length;
     const tieneVenc = g.facturas.some(f=>diasMora(f.fechaVenc)>0);
-    const isExpanded = expandedId === g.clienteId;
+    const isExpanded = expandedId === String(g.clienteId);
 
-    html += `<tr onclick="toggleCobrarCliente('${g.clienteId}')" style="cursor:pointer;background:${isExpanded?'var(--green-bg)':'var(--bg)'};border-left:3px solid ${tieneVenc?'var(--red)':'var(--amber)'}">
-      <td style="padding:12px 10px;font-weight:700;color:var(--text);font-size:13px">
-        <span style="margin-right:8px;font-size:10px;color:var(--text3)">${isExpanded?'▼':'▶'}</span>
-        ${he(g.nombre)}
-        <span class="badge ${tieneVenc?'red':'amber'}" style="margin-left:8px;font-size:10px">${nFacs} factura${nFacs!==1?'s':''}</span>
+    html += `<tr style="background:${isExpanded?'var(--green-bg)':'var(--bg)'};border-left:3px solid ${tieneVenc?'var(--red)':'var(--amber)'}">
+      <td colspan="5" onclick="toggleCobrarCliente('${g.clienteId}')" style="cursor:pointer;padding:12px 10px">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div style="display:flex;align-items:center;gap:8px">
+            <span style="font-size:11px;color:var(--text3)">${isExpanded?'▼':'▶'}</span>
+            <span style="font-weight:700;color:var(--text);font-size:13px">${he(g.nombre)}</span>
+            <span class="badge ${tieneVenc?'red':'amber'}" style="font-size:10px">${nFacs} factura${nFacs!==1?'s':''}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:20px">
+            <span style="font-size:11px;color:var(--text3);font-family:var(--fm)">Pagado: Gs.${fmt(pagadoG)}</span>
+            <span style="font-family:var(--fm);font-weight:800;font-size:14px;color:${tieneVenc?'var(--red)':'var(--amber)'}">Gs.${fmt(saldoG)}</span>
+            ${tieneVenc?'<span class="mora-chip late">Con mora</span>':'<span class="mora-chip ok">Al día</span>'}
+          </div>
+        </div>
       </td>
-      <td class="r" style="padding:12px 10px;font-family:var(--fm);color:var(--text3)">Gs.${fmt(pagadoG)}</td>
-      <td class="r" style="padding:12px 10px;font-family:var(--fm);font-weight:800;font-size:14px;color:${tieneVenc?'var(--red)':'var(--amber)'}">Gs.${fmt(saldoG)}</td>
-      <td style="padding:12px 10px;text-align:center">${tieneVenc?'<span class="mora-chip late">Con mora</span>':'<span class="mora-chip ok">Al día</span>'}</td>
-      <td style="padding:12px 10px"></td>
     </tr>`;
 
     if (isExpanded) {
@@ -1092,7 +1097,7 @@ function renderCobrar() {
 }
 
 function toggleCobrarCliente(cid) {
-  window._cobrarExpandedCli = (window._cobrarExpandedCli === cid) ? null : cid;
+  window._cobrarExpandedCli = (String(window._cobrarExpandedCli) === String(cid)) ? null : cid;
   renderCobrar();
 }
 
