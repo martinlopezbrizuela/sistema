@@ -909,14 +909,23 @@ function renderFacturas() {
   if (filter!=='todos') data=data.filter(f=>f.estado===filter);
 
   // Mini stats
-  const totalFac = facturas.reduce((s,f)=>s+Number(f.total||0),0);
+  if (!window._facAnio) window._facAnio = new Date().getFullYear();
+  const anio = window._facAnio;
+  const anios = [...new Set(facturas.map(f=>f.fecha?f.fecha.slice(0,4):null).filter(Boolean))].sort((a,b)=>b-a);
+  const facAnio = facturas.filter(f=>f.fecha&&f.fecha.startsWith(String(anio)));
+  const totalAnio = facAnio.reduce((s,f)=>s+Number(f.total||0),0);
   const totalContado = facturas.filter(f=>f.condicion==='contado').reduce((s,f)=>s+Number(f.total||0),0);
   const totalCredito = facturas.filter(f=>f.condicion==='credito').reduce((s,f)=>s+Number(f.total||0),0);
+  const optsAnio = anios.length ? anios.map(a=>`<option value="${a}"${String(a)===String(anio)?'selected':''}>${a}</option>`).join('') : `<option value="${anio}">${anio}</option>`;
   const statsEl = document.getElementById('fac-mini-stats');
   if (statsEl) statsEl.innerHTML = `
-    <div class="mini-stat"><div class="val" style="color:var(--green)">Gs.${fmt(totalFac)}</div><div class="lbl">Total facturado</div></div>
-    <div class="mini-stat"><div class="val" style="color:var(--blue)">Gs.${fmt(totalContado)}</div><div class="lbl">Contado</div></div>
-    <div class="mini-stat"><div class="val" style="color:var(--amber)">Gs.${fmt(totalCredito)}</div><div class="lbl">Crédito</div></div>
+    <div class="mini-stat">
+      <select onchange="window._facAnio=parseInt(this.value);renderFacturas()" style="font-family:var(--fm);font-size:12px;font-weight:700;color:var(--g2);background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:2px 6px;cursor:pointer;margin-bottom:4px">${optsAnio}</select>
+      <div class="val" style="color:var(--green)">Gs.${fmt(totalAnio)}</div>
+      <div class="lbl">Ventas ${anio}</div>
+    </div>
+    <div class="mini-stat"><div class="val" style="color:var(--blue)">Gs.${fmt(totalContado)}</div><div class="lbl">Contado (total)</div></div>
+    <div class="mini-stat"><div class="val" style="color:var(--amber)">Gs.${fmt(totalCredito)}</div><div class="lbl">Crédito (total)</div></div>
   `;
 
   const tb=document.getElementById('tabla-facturas');
