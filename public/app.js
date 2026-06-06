@@ -1054,19 +1054,19 @@ function renderCobrar() {
     const isExpanded = expandedId === String(g.clienteId);
 
     html += `<tr style="background:${isExpanded?'var(--green-bg)':'var(--bg)'};border-left:3px solid ${tieneVenc?'var(--red)':'var(--amber)'}">
-      <td colspan="5" onclick="toggleCobrarCliente('${g.clienteId}')" style="cursor:pointer;padding:12px 10px">
-        <div style="display:flex;align-items:center;justify-content:space-between">
+      <td colspan="5" style="padding:0">
+        <button onclick="toggleCobrarCliente('${g.clienteId}')" style="width:100%;background:none;border:none;cursor:pointer;padding:12px 10px;text-align:left;display:flex;align-items:center;justify-content:space-between;font-family:var(--ff)">
           <div style="display:flex;align-items:center;gap:8px">
             <span style="font-size:11px;color:var(--text3)">${isExpanded?'▼':'▶'}</span>
             <span style="font-weight:700;color:var(--text);font-size:13px">${he(g.nombre)}</span>
             <span class="badge ${tieneVenc?'red':'amber'}" style="font-size:10px">${nFacs} factura${nFacs!==1?'s':''}</span>
           </div>
-          <div style="display:flex;align-items:center;gap:20px">
+          <div style="display:flex;align-items:center;gap:16px">
             <span style="font-size:11px;color:var(--text3);font-family:var(--fm)">Pagado: Gs.${fmt(pagadoG)}</span>
             <span style="font-family:var(--fm);font-weight:800;font-size:14px;color:${tieneVenc?'var(--red)':'var(--amber)'}">Gs.${fmt(saldoG)}</span>
             ${tieneVenc?'<span class="mora-chip late">Con mora</span>':'<span class="mora-chip ok">Al día</span>'}
           </div>
-        </div>
+        </button>
       </td>
     </tr>`;
 
