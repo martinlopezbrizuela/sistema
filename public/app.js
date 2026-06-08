@@ -933,6 +933,7 @@ function renderFacturas() {
   tb.innerHTML=data.map(f=>{
     const acc=[`<button class="btn-t gr" onclick="verDocumento('fac',${f.id})">👁</button>`];
     if (f.condicion==='credito'&&f.estado!=='pagada') acc.push(`<button class="btn-t g" onclick="openPago(${f.id})">💰 Pago</button>`);
+    acc.push(`<button class="btn-t gr" onclick="editFactura(${f.id})">✏</button>`);
     acc.push(`<button class="btn-t r" onclick="delFactura(${f.id})">🗑</button>`);
     return `<tr>
       <td style="font-family:var(--fm);font-size:11px;color:var(--g2)">${f.num}</td>
@@ -994,10 +995,10 @@ function saveFactura() {
     items:itemsFac.map(r=>({...r})), ...tots,
     condicion, diasCredito:dias, fechaVenc,
     obs:document.getElementById('fac-obs').value.trim(),
-    estado:condicion==='contado'?'pagada':'pendiente',
-    pagado:condicion==='contado'?tots.total:0,
-    saldo:condicion==='contado'?0:tots.total,
-    pagos:[], pedidoId:pedId, presuId,
+    estado:ex?(condicion==='contado'?'pagada':ex.estado):(condicion==='contado'?'pagada':'pendiente'),
+    pagado:ex?(condicion==='contado'?tots.total:Number(ex.pagado||0)):(condicion==='contado'?tots.total:0),
+    saldo:ex?(condicion==='contado'?0:tots.total-Number(ex.pagado||0)):(condicion==='contado'?0:tots.total),
+    pagos:ex?ex.pagos:[], pedidoId:pedId, presuId,
   };
   if (eid) facturas=facturas.map(x=>x.id===parseInt(eid)?obj:x); else facturas.unshift(obj);
   if (pedId){const p=pedidos.find(x=>x.id===pedId);if(p)p.facturadoId=obj.id;}
@@ -1006,6 +1007,25 @@ function saveFactura() {
   toast(condicion==='contado'?'Factura contado — PAGADA ✓':'Factura crédito — en Cuentas a Cobrar');
   renderPanel(activePanel); updateSidebar();
 }
+function editFactura(id) {
+  const f = facturas.find(x=>x.id===id); if(!f) return;
+  itemsFac = (f.items||[]).map(x=>({...x, id:Date.now()+Math.random()}));
+  document.getElementById('fac-id').value = f.id;
+  document.getElementById('fac-pedido-id').value = f.pedidoId||'';
+  document.getElementById('fac-presu-id').value = f.presuId||'';
+  document.getElementById('modal-fac-title').textContent = 'Editar Factura — '+f.num;
+  fillCliSel('fac-cliente', f.clienteId);
+  document.getElementById('fac-fecha').value = f.fecha||today();
+  document.getElementById('fac-timbrado').value = f.timbrado||'';
+  document.getElementById('fac-num-display').value = f.num;
+  document.getElementById('fac-vendedor').value = f.vendedor||'';
+  document.getElementById('fac-condicion').value = f.condicion||'contado';
+  document.getElementById('fac-dias').value = f.diasCredito||30;
+  document.getElementById('fac-obs').value = f.obs||'';
+  facCondChanged(); renderItemRows('fac');
+  openModal('modal-factura');
+}
+
 function delFactura(id) {
   if (!confirm('¿Eliminar factura?')) return;
   facturas=facturas.filter(x=>x.id!==id); saveAll(); toast('Factura eliminada'); renderPanel(activePanel); updateSidebar();
